@@ -25,10 +25,10 @@ class statisticsCollection():
 		self.back_off_collection_time.append(time)
 		self.contention_STAsN.append(contention_STAsN)
 
-	def successful_transmission_register(self,packet,time):
+	def register_successful_transmission(self,packet,time):
 		self.successful_transmissions.append([packet,time])
 
-	def collision_register(self):
+	def register_collision(self):
 		self.collisions+=1
 
 	def delay_register(self,delay):
@@ -57,10 +57,10 @@ class statisticsCollection():
 	def print_other_statistics(self,end_time,packet_size):
 		self.file.write("there are "+str(self.number_of_packet)+" packets need to be transmit.\n")
 		self.file.write("there are "+str(self.successful_transmissions.__len__())+ " packets has been transmitted.\n")
-		self.file.write("the average # of backoffs "+str(sum(self.average_backoffs)/self.average_backoffs.__len__())+"\n")
-		self.file.write("transmission times are: \n")
-		for each in self.successful_transmissions:
-			self.file.write("From STA "+str(each[0].source.AID)+" at "+str(each[1])+"\n")
+		# self.file.write("the average # of backoffs "+str(sum(self.average_backoffs)/self.average_backoffs.__len__())+"\n")
+		# self.file.write("transmission times are: \n")
+		# for each in self.successful_transmissions:
+		# 	self.file.write("From STA "+str(each[0].source.AID)+" at "+str(each[1])+"\n")
 		# self.file.write("successful_transmissions:"+str(self.successful_transmissions.__len__())+"\n")
 		self.file.write("collisions:"+str(self.collisions)+"\n")
 		self.file.write("Throughput:"+str(self.successful_transmissions.__len__()*packet_size*8/(self.end_time/10**6)/10**3)+" kbps"+"\n")
@@ -70,8 +70,8 @@ class statisticsCollection():
 		# self.file.write("There are "+str(self.suspension.__len__())+" packets has been suspended to transmit\n")
 		self.file.write("The end time is "+str(self.end_time)+"\n")
 		self.file.write("backoff stage is\n"+str(self.back_off_stage)+"\n")
-		self.file.write("Number of contention STAs\n"+str(self.contention_STAsN)+"\n")
-		self.file.write("the collect time is\n"+str(self.back_off_collection_time)+"\n")
+		# self.file.write("Number of contention STAs\n"+str(self.contention_STAsN)+"\n")
+		# self.file.write("the collect time is\n"+str(self.back_off_collection_time)+"\n")
 
 
 		# for each in self.suspension:

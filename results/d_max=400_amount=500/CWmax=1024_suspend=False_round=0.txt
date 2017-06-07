@@ -1,0 +1,13 @@
+maximum delay is:409.32827079667993
+minimum delay is:2.240666666666664
+mean value of the delays:159.00110678026584
+standard deviation:145.00217481270923
+there are 58 packets need to be transmit.
+there are 58 packets has been transmitted.
+collisions:111
+Throughput:20.415691021065104 kbps
+Transmission successful probability:0.3431952662721893
+channel busy time:28136450.13178872
+The end time is 454552.33381151815
+backoff stage is
+[]
