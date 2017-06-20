@@ -9,8 +9,9 @@ class SystemTimer():
 		self.slot_time=52 #in us, 24.3.14 in the draft 5.0
 		self.SIFS=160 # in us, https://mentor.ieee.org/802.11/dcn/12/11-12-1104-02-00ah-11ah-interframe-spacing-values.pptx
 		self.DIFS=264 # in us, in 3.9 of doc.:IEEE 8021.11-11/1137r15
-		self.ACK_time=750 #14*40 # in us, using 150kbps, packet size 100 bytes, NDP_ACK 14*40 us, +SIFS
-		self.EIFS=self.SIFS+self.DIFS+self.ACK_time
+		self.ACK_time=750 #14*40 # in us, using 150kbps, packet size 100 bytes, NDP_ACK 14*40 us, +SIFS ????
+		self.NDP_time=560 #14*40 in us
+		self.EIFS=self.SIFS+self.DIFS+self.NDP_time
 		self.events=[]
 		self.backoff_status="Off"
 
@@ -32,25 +33,32 @@ class SystemTimer():
 		 	print("systemTimer.py: register "+str(event.type)+ " of time "+str(event.time)+" at "+str(event.device_list[0].AID))
 		self.events.sort(key=lambda x:x.time)
 
-	def remove_event(self,event):
-		import time
-		if event.time>self.end_time:
-			return 0
-		temp_len=event.device_list.__len__()
-		flag=0
-		for each_event in self.events:
-			if event.time==each_event.time and event.type==each_event.type and (event.device_list[0] in each_event.device_list):
-				# print("event address:"+str(id(event)))
-				assert event.device_list.__len__()==1
-				each_event.device_list.remove(event.device_list[0])
-				if not each_event.device_list: # remove this event from the timer record
+	def remove_event(self,event=None,device=None):
+		assert event==None or device==None, "function remove_event in system_timer.py"
+		if event!=None:
+			if event.time>self.end_time:
+					return 0
+			temp_len=event.device_list.__len__()
+			flag=0
+			for each_event in self.events:
+				if event.time==each_event.time and event.type==each_event.type and (event.device_list[0] in each_event.device_list):
+					# print("event address:"+str(id(event)))
+					assert event.device_list.__len__()==1
+					each_event.device_list.remove(event.device_list[0])
+					if not each_event.device_list: # remove this event from the timer record
+						self.events.remove(each_event)
+					flag=1
+					break
+			assert flag==1, "remove a event does not exist "
+			assert temp_len==event.device_list.__len__(), str(temp_len)+" "+str(event.device_list.__len__())
+		else:
+			assert device!=None, "no device and no event need to be removed"
+			for each_event in self.events: # remove all the related event
+				if device in each_event.device_list: # remove the device from this event
+					each_event.device_list.remove(device)
+				if not each_event.device_list:
 					self.events.remove(each_event)
-				flag=1
-				break
-		assert flag==1, "remove a event does not exist "
-		assert temp_len==event.device_list.__len__(), str(temp_len)+" "+str(event.device_list.__len__())
 		return 0
-
 
 	def get_next_events(self): #get all the events in next time point
 		if self.events:

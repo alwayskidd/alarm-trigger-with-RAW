@@ -8,6 +8,8 @@ class Event():
 		#	transmission end---end of an packet transmission; duration is 0
 		#	IFS expire---when the IFS a device is waiting for has been passed
 		#   reply timeout---the event that an cts/ack/data is timeout
+		#   Wakeup for a RAW--sensors wakes up according to the RAW
+		#	Wakeup during open access--sensors may wakes up during the open access
 		self.time=start_time
 		self.device_list=[]
 		self.duration=duration
@@ -66,24 +68,28 @@ class Event():
 	#	channel--the system channel object 
 		if self.type=="backoff":
 			self.backoff_excute(device_list,timer)
-
 		if self.type=="packet arrival": #generate one packet
 			for each_STA in self.device_list:
 				each_STA.generate_one_packet()
-
 		if self.type=="IFS expire":
 			for each_device in self.device_list:
 				each_device.IFS_expire()
-
 		if self.type=="reply timeout":
 			from sensor import Sensor
 			for each_device in self.device_list:
 				assert isinstance(each_device,Sensor), "Access point has a reply timeout event"
 				each_device.reply_timeout()
-
 		if self.type=="transmission end":
 			self.transmission_end_excute(device_list,timer,channel)
-
 		if self.type=="NAV expire":
 			for each_device in self.device_list:
 				each_device.NAV_expire()
+		if self.type=="Wakeup for RAW":
+			for each_device in self.device_list:
+				each_device.wakeup_in_RAW()
+		if self.type=="Wakeup during open access":
+			for each_device in self.device_list:
+				each_device.wakeup_in_open_access()
+		if self.type=="Endup RAW":
+			for each_device in self.device_list:
+				each_device.end_up_RAW()

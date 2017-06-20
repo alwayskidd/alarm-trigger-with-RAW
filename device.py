@@ -34,7 +34,10 @@ class Device:
     #This function is called when the power level in the channel has been changed
     #The channel status will be changed if the power level reaches the minimum interference power
     #Input: 
-    #   packets_in_air: the list of packets that are transmitting in the air
+    #   packets_in_air-- the list of packets that are transmitting in the air
+    #Output:
+    #   True--the channel status is changed
+    #   False--the channel status is not changed
         self.receiving_power=0
         for each in packets_in_air:
             if each.source!=self: # add the receiving power at the attena
@@ -53,6 +56,7 @@ class Device:
                     self.timer.remove_event(self.IFS_expire_event)
                     self.IFS_expire_event=None
                     self.packet_to_send=None
+            return True
 
         if self.receiving_power<10**(self.minimum_interference_power/10) and self.channel_state=="Busy":
         # change the sensed channel status to Idle in this device
@@ -71,6 +75,8 @@ class Device:
                         new_event.register_device(self)
                         self.timer.register_event(new_event) # The EIFS expire event may be replaced by DIFS if the packet can be decoded
                         self.IFS_expire_event=new_event
+            return True
+        return False
 
     def update_packet_can_receive(self,new_packet):
     #This function is called when there is a new packet join the network
@@ -80,7 +86,7 @@ class Device:
         import math
         if new_packet.source==self:
             return False
-        if self.status!="Listen": # no packet can be received in this two status
+        if self.status!="Listen": # no packet can be received while STA is not listen
             self.packet_can_receive=None
             return False
         if self.packet_can_receive!=None: # exist a packet that can be corretly decoded, we need to judge if it can still be decoded

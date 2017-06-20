@@ -57,7 +57,7 @@ class channel():
 	# This function is called when a packet has finished its transmission
 	# Input:
 	#	packet--the packet that finished its transmission
-		print("a packet has finished its transmission")
+		print("a packet has finished its transmission at "+str(packet.source.AID))
 		import math
 		# print(self.packet_list)
 		# print(self)

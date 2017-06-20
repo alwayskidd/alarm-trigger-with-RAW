@@ -1,49 +1,10 @@
-import system_timer,sensor,event,channel,AP
-# import systemTimer, sensor, event, channel, AP
+import system_timer,sensor,event,channel,AP,block,initialization
 import statistics_collection, random, math
-
-def initialization(amount,d_max,timer,RTS_enable,suspend_enable,CWmax,channel):
-	# RTS_enable=True
-	CWmin=16
-
-	file=open("./events/station_list_amount="+str(amount)+"_d_max="+str(d_max)+".pkl","rb")
-	import pickle
-	amount=pickle.load(file)
-	# system_AP=AP.AP
-	system_AP=AP.AP([0,0],CWmin,CWmax,timer,channel)
-	STA_list=[]
-	for i in range(amount): # generate sensors at certain locations
-		x=pickle.load(file)
-		y=pickle.load(file)
-		STA_list.append(sensor.Sensor(i+1,CWmin,CWmax,[x,y],RTS_enable,suspend_enable,system_AP,timer,channel))
-	file.close()
-	system_AP.register_associated_STAs(STA_list)
-
-	file=open("./events/packet_events_amount="+str(amount)+"_d_max="+str(d_max)+".pkl","rb")
-	amount=pickle.load(file)
-	print("there are "+str(amount)+" packet there")
-	import time
-	time.sleep(1)
-
-	for i in range(amount):
-		start_time=pickle.load(file)
-		AID=pickle.load(file)
-		assert STA_list[AID-1].AID==AID
-		new_event=event.Event("packet arrival",start_time)
-		new_event.register_device(STA_list[AID-1])
-			# event=pickle.load(file)
-		timer.register_event(new_event)
-		statistics_collection.collector.register_packet_generated()
-	file.close()
-	system_AP.STA_list=STA_list
-	print("STA amount is "+str(STA_list.__len__()))
-	return(system_AP,STA_list)
-
 def test(RTS_enable,suspend_enable,CWmax):
 	PRAWs_duration=5.3*1000
 	BI=500*1000
 	#STA_number=20
-	CWmin=16
+	CWmin=15
 	# CWmax=16*(2**6)
 	#packet_arrival_rate=1.0/150000 #in us
 	end_time=10**7
@@ -66,7 +27,7 @@ def test(RTS_enable,suspend_enable,CWmax):
 		# file=open("./results/d_max="+str(d_max)+"_amount="+str(amount)+"/CWmax=unlimited"+"_suspend="+str(suspend_enable)+"_round="+str(times)+".txt","w")
 		statistics_collection.collector.set_output_file(file)
 		system_channel=channel.channel()
-		system_AP,STA_list=initialization(amount,d_max,timer,RTS_enable,suspend_enable,CWmax,system_channel)
+		system_AP,STA_list=initialization.init(amount,d_max,timer,RTS_enable,suspend_enable,CWmax,system_channel)
 		system_channel.register_devices(STA_list+[system_AP])
 		# system_channel=channel.channel(system_AP,STA_list)
 		system_AP.channel=system_channel
@@ -117,5 +78,5 @@ def test(RTS_enable,suspend_enable,CWmax):
 		file.close()
 
 for i in range(6,7):
-	test(RTS_enable=False,suspend_enable=True,CWmax=16*(2**i))
+	test(RTS_enable=False,suspend_enable=True,CWmax=16*(2**i)-1)
 # test(RTS_enable=False,suspend_enable=False,CWmax=16)
