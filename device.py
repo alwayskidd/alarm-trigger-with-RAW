@@ -16,18 +16,25 @@ class Device:
         self.minimum_interference_power=-105 #dBm
         self.minimum_hearing_power=-98 #dBm
         self.AID=None
+        self.last_packet_sent=None
 
     def transmit_packet(self,packet):
     #This function is called when a packet needs to be sent immediately
     #Input: packet--the packet need to be sent
-        print("A frame is transmitted into the air from device "+str(self.AID))
-        self.channel.register_transmission_in_air(packet)
+        assert self.packet_in_air==None, 'transmit two packets at the same time '+str(self.AID)
         self.packet_in_air=packet
+        new_event=event.Event("transmit packet",self.timer.current_time)
+        new_event.register_device(self)
+        self.timer.register_event(new_event)
         # Let the timer know when the packet transmission will be ended.
+        # print("A packet from STA "+str(self.AID)+" is transmitted in the air at "+str(self.timer.current_time))
         new_event=event.Event("transmission end",self.timer.current_time+packet.transmission_delay())
         new_event.register_device(self)
         self.timer.register_event(new_event)
         self.status="Trasmit"
+        self.packet_can_receive=None
+        self.last_packet_sent=packet
+        self.backoff_status="Off"
         return True
 
     def update_receiving_power(self,packets_in_air):
@@ -49,8 +56,8 @@ class Device:
             self.channel_state="Busy"
             self.backoff_status="Off" # backoff is interrupted
             if self.IFS_expire_event!=None: # IFS may be interrupted since channel get busy
-                if (self.packet_to_send==None or (self.packet_to_send.packet_type!="CTS")
-                    and self.packet_to_send.packet_type!="ACK"):
+                if (self.packet_to_send==None or (self.packet_to_send.packet_type!="CTS"
+                    and self.packet_to_send.packet_type!="NDP ACK")):
             # The intrruption will be ignored when the pending packet is ACK or CTS frame
                     assert self.IFS_expire_event.time>=self.timer.current_time
                     self.timer.remove_event(self.IFS_expire_event)
@@ -93,11 +100,14 @@ class Device:
             signal_power=self.channel.rx_power_at_STA(self.packet_can_receive.source,self)
             signal_power=10**(signal_power/10)
             interference_power=self.receiving_power-signal_power
-            SINR=10*math.log10(signal_power/interference_power)
-            if SINR<5: #dB the current packet is interfered that cannot be decoded any longer
-                self.packet_can_receive=None
-            else: # this packet can still be decoded, i.e., the new joined packet cannot be decoded.
-                return False
+            if interference_power<0:
+                print([interference_power,signal_power,self.receiving_power])
+            if interference_power!=0:
+                SINR=10*math.log10(signal_power/interference_power)
+                if SINR<5: #dB the current packet is interfered that cannot be decoded any longer
+                    self.packet_can_receive=None
+                else: # this packet can still be decoded, i.e., the new joined packet cannot be decoded.
+                    return False
         # To check whether the new packet can be decoded.
         signal_power=self.channel.rx_power_at_STA(new_packet.source,self)
         if signal_power<self.minimum_hearing_power: # the packet cannot be received
@@ -113,3 +123,22 @@ class Device:
             return True
         else:
             return False
+    ####
+    def generate_one_packet(self):
+        pass
+    def IFS_expire(self):
+        pass
+    def reply_timeout(self):
+        pass
+    def wakeup_in_RAW(self):
+        pass
+    def wakeup_in_open_access(self):
+        pass
+    def end_up_RAW(self):
+        pass
+    def NAV_expire(self):
+        pass
+    def RAW_slot_start(self):
+        pass
+    def polling_round_end(self):
+        pass

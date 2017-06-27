@@ -33,7 +33,7 @@ def init(amount,d_max,timer,RTS_enable,suspend_enable,CWmax,channel):
 
 def AID_assignment(STA_list,radius=1000):
     import math
-    block_list=[]
+    block_list=block.BlockList()
     search_areas=[]
     search_areas.append([radius,0,-radius,0]) #top,bottom,left,right
     search_areas.append([radius,0,0,radius])
@@ -44,12 +44,12 @@ def AID_assignment(STA_list,radius=1000):
     while search_areas: # assign AIDs
         area=search_areas.pop(0)
         [top,bottom,left,right]=area
-        new_block=block.Block(block_ID,area,sub_blocks=[],level=math.log2(radius//(top-bottom)))
+        new_block=block.Block(block_ID,area,level=math.log2(radius//(top-bottom)))
         for each_STA in STA_list:
             if each_STA.x<right and each_STA.x>=left and each_STA.y<top and each_STA.y>=bottom: #
                 new_block.add_STA(each_STA)
         if new_block.STA_list:
-            block_list.append(new_block)
+            block_list.add_block(new_block)
             block_ID+=1
             if new_block.STA_list.__len__()==1: # assign the lowest AID to this node
                 new_block.STA_list[0].AID=AID
@@ -61,3 +61,7 @@ def AID_assignment(STA_list,radius=1000):
                 search_areas.insert(1,[top,center_y,center_x,right])
                 search_areas.insert(2,[center_y,bottom,left,center_x])
                 search_areas.insert(3,[center_y,bottom,center_x,right])
+    # import time
+    block_list.block_relationship_construct()
+    block_list.print_blocks_information()
+    return block_list
