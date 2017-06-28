@@ -19,18 +19,19 @@ class Event():
         self.device_list=[]
         self.duration=duration
         priorities={
-            "transmit packet": 0,
+            "transmit packet": 1,
             "packet arrival": 1,
             "backoff": 1,
             "transmission end": 1,
             "IFS expire": 1,
             "reply timeout": 1,
             "NAV expire":1,
-            "Wakeup for RAW": 2,
+            "Wakeup for RAW": 0,
             "Endup RAW":1,
             "Raw slot start": 2,
-            "Wakeup during open access": 3,
+            "Wakeup during open access": 0,
             "Polling round end":2,
+            "Alarm detected": 9
         }
         self.priority=priorities[self.type]
 
@@ -88,6 +89,9 @@ class Event():
                 new_packets.append(each_device.packet_in_air)
                 print("A packet from STA "+str(each_device.AID)+" is transmitted in the air")
             channel.register_transmission_in_air(new_packets)
+        elif self.type=="Alarm detected":
+            for each_device in self.device_list:
+                each_device.alarm_detected()
         else:
             for each_device in self.device_list:
                 function_list={'packet arrival': each_device.generate_one_packet,

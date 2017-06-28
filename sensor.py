@@ -259,6 +259,7 @@ class Sensor(device.Device):
             new_event=event.Event("IFS expire",self.timer.DIFS+self.timer.current_time)
             new_event.register_device(self)
             self.timer.register_event(new_event)
+            self.IFS_expire_event=new_event
         new_event=event.Event("Endup RAW",self.next_RAW_slot.end_time) # end this RAW
         new_event.register_device(self)
         self.timer.register_event(new_event)
@@ -297,6 +298,7 @@ class Sensor(device.Device):
         if self.channel_state=="Idle":
             new_event=event.Event("IFS expire",self.timer.DIFS+self.timer.current_time)
             new_event.register_device(self)
+            self.IFS_expire_event=new_event
             self.timer.register_event(new_event)
             self.IFS_expire_event=new_event
         return True

@@ -10,12 +10,12 @@ class Block:
         self.ID=block_ID
         self.area=area # [top,bottom,left,right]
         [self.top,self.bottom,self.left,self.right]=area
-        self.STA_polled,self.block_polled=[],False # the polling situation of a STA and a block
+        self.STA_received,self.block_finished=[],False # the polling situation of a STA and a block
         self.block_check=None # could be True if the block has alarm report, or False if the block has no alarm report
         # if the alarm report from this STA is received then this STA is regarded as being polled
         # if all the STAs in the block are being polled then the block is regarded as being polled
 
-    def STA_polled(self,STA):
+    def report_received(self,STA):
     # This function is called when a alarm report is received, or AP has polled this STA
     # This function is to remark the STA as a polled STA
     # Input:
@@ -24,11 +24,11 @@ class Block:
     #   True--all STAs in this block are polled; False--otherwise
         assert STA in self.STA_list, "recieved an alarm from STA not in this block"
         # assert not STA in self.STA_polled, "received an alarm from STA which have already reported"
-        if not STA in self.STA_polled:
-            self.STA_polled.append(STA)
-        if len(self.STA_list)==len(self.STA_polled): # remark this block as a polled block
-            self.block_polled=True
-        return self.block_polled
+        if not STA in self.STA_received:
+            self.STA_received.append(STA)
+        if len(set(self.STA_list))==len(set(self.STA_polled)): # remark this block as a polled block
+            self.block_finished=True
+        return self.block_finished
 
     def add_STA(self,STA):
         self.STA_list.append(STA)
@@ -105,21 +105,21 @@ class BlockList():
                     neighbours.append(each_block)
         return(neighbours)
 
-    def STA_polled(self,STA):
+    def report_received(self,STA):
     # This function is called when an alarm report is received, or AP polled this STA
     # This function is used to remark the source of the alarm report in its blocks as polled
     # Input:
     #   STA--the STA that has been polled
         for each_block in self.blocks:
             if STA in each_block.STA_list:
-                each_block.alarm_received(STA)
+                each_block.report_received(STA)
 
     def get_blocks_at_certain_level(self,level):
         return [block for block in self.blocks if block.level==level]
 
 
     def print_blocks_information(self):
-        blocks=[x for x in self.blocks if x.STA_polled]
+        blocks=[x for x in self.blocks if x.STA_received]
         print("There are totally "+str(blocks.__len__())+" blocks")
         for each_block in blocks:
             print(each_block.children_blocks.__len__())

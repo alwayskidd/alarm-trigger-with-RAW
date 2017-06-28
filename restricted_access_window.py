@@ -120,7 +120,7 @@ class PollingRound():
         self.STAs_to_poll=STAs_to_poll
         self.blocks_to_check=blocks_to_check
 
-    def generate_beacon(self,beacon_announce_time):
+    def generate_beacon(self,beacon_announce_time,channel_status,max_data_size):
     # This function is called to generate the RAWs according to the STAs need to check whether they have alarm report,
     # the STAs need to collect their alarm report (i.e., these STAs have checked and the AP find they have alarm report)
     # and the blocks that need to be check whether they are affected by the event
@@ -149,10 +149,17 @@ class PollingRound():
         self.RAWs=self.trigger_RAWs+self.collect_RAWs+self.check_RAWs
         # set the parameters of all the raws in this polling round
         beacon=packet.BeaconFrame(self.RAWs,self.timer,self.AP,self.STA_list)
-        start_time=beacon_announce_time+beacon.transmission_delay()+1
+        if channel_status=="Busy": # need multiple beacon frame to ensure the beacon is correctly received
+            import math
+            transmission_finish_time=packet.Packet(self.timer,"Data",None,None,
+                size=max_data_size).transmission_delay()
+            duration_for_beacon=self.timer.SIFS+beacon.transmission_delay()
+            number_of_beacons=math.ceil(transmission_finish_time/duration_for_beacon)+1
+            start_time=number_of_beacons*duration_for_beacon+beacon_announce_time+1-self.timer.SIFS
+        else:   
+            start_time=beacon_announce_time+beacon.transmission_delay()+1
 
         if self.trigger_RAWs:
-            # print([x.AID for x in self.STAs_to_check])
             self.trigger_RAWs[0].parameter_setting(start_time,self.trigger_slot_duration*self.STAs_to_check.__len__(),
                 self.STAs_to_check.__len__(),self.STA_list) # set the parameters of the trigger RAW
             start_time=self.trigger_RAWs[0].end_time
@@ -166,7 +173,11 @@ class PollingRound():
             # set the parameters of check RAW
             start_time=self.check_RAWs[i].end_time
         self.end_time=self.RAWs[-1].end_time
-        return beacon
+
+        if channel_status=="Busy":
+            return [beacon]*number_of_beacons
+        else:
+            return [beacon]
 
     def find_current_slot(self,current_time):
     # This function is called when a raw slot start, we need to identify which raw slot it is
@@ -190,7 +201,7 @@ class PollingRound():
         next_STAs_to_collect,next_STAs_to_check,next_blocks_to_check=[],[],[]
         for each_RAW in self.trigger_RAWs:
             for each_slot in each_RAW.slot_list: # check whether the ps-poll is get
-                assert each_slot.status=="Idle" or each_slot.status=="Received", 'a Trigger RAW slot is Collided'
+                # assert each_slot.status=="Idle" or each_slot.status=="Received", 'a Trigger RAW slot is Collided'
                 if each_slot.status=="Received": # collect data from this STA in next round
                     next_STAs_to_collect+=each_slot.STAs
         for each_RAW in self.check_RAWs:

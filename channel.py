@@ -63,3 +63,7 @@ class channel():
         print("There are currently "+str(self.packet_list.__len__())+" STAs are transmitting:"+
             str([x.AID for x in self.transmission_STA_list]))
         self.__update_receiving_power__()
+        # for each_device in self.device_list:
+        #     each_device.update_receiving_power(self.packet_list)
+        #     if packet==each.packet_can_receive: # receive this packet
+        #             each.packet_received(packet)

@@ -14,7 +14,7 @@ def test(RTS_enable,suspend_enable,CWmax):
     amount=500 # the total number of stations, it is used to read the corresponding files
     d_max=1000
 
-    for times in range(0,1):
+    for times in range(1,2):
         print("system end time="+str(end_time))
         ############## initialization ###########	
         timer=system_timer.SystemTimer(end_time)
@@ -38,7 +38,7 @@ def test(RTS_enable,suspend_enable,CWmax):
             current_events=timer.get_next_events()
             for each_event in current_events:
                 if each_event.type!="backoff":
-                    print("The event type is "+each_event.type)
+                    print("The event type is "+each_event.type+" at "+str(timer.current_time))
                 if each_event.time>timer.end_time: # end the pragram
                     break
                 each_event.execute(STA_list+[system_AP],timer,system_channel)	#### !!!!!
