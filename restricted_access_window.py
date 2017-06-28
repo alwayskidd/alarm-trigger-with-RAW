@@ -105,7 +105,7 @@ class PollingRound():
         import packet
         temp=timer.slot_time*15+timer.DIFS+timer.SIFS+packet.Packet(timer,'NDP ACK').transmission_delay()+1
         self.trigger_slot_duration=temp+packet.Packet(timer,'NDP Ps-poll').transmission_delay()
-        self.data_slot_duration=temp+packet.Packet(timer,'Data',max_data_size).transmission_delay()
+        self.data_slot_duration=temp+packet.Packet(timer,'Data',size=max_data_size).transmission_delay()
         self.timer=timer
         self.AP,self.STA_list=AP,STA_list
         self.current_RAW_slot=None
@@ -151,8 +151,7 @@ class PollingRound():
         beacon=packet.BeaconFrame(self.RAWs,self.timer,self.AP,self.STA_list)
         if channel_status=="Busy": # need multiple beacon frame to ensure the beacon is correctly received
             import math
-            transmission_finish_time=packet.Packet(self.timer,"Data",None,None,
-                size=max_data_size).transmission_delay()
+            transmission_finish_time=packet.Packet(self.timer,"Data",size=max_data_size).transmission_delay()
             duration_for_beacon=self.timer.SIFS+beacon.transmission_delay()
             number_of_beacons=math.ceil(transmission_finish_time/duration_for_beacon)+1
             start_time=number_of_beacons*duration_for_beacon+beacon_announce_time+1-self.timer.SIFS
@@ -172,8 +171,8 @@ class PollingRound():
             self.check_RAWs[i].parameter_setting(start_time,self.data_slot_duration,block,self.STA_list) 
             # set the parameters of check RAW
             start_time=self.check_RAWs[i].end_time
-        self.end_time=self.RAWs[-1].end_time
 
+        self.end_time=max(x.end_time for x in beacon.RAWs)
         if channel_status=="Busy":
             return [beacon]*number_of_beacons
         else:

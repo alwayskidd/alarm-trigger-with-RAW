@@ -88,11 +88,13 @@ class  AP(device.Device): # has no  downlink traffic there
                 new_event=event.Event("Alarm detected",self.timer.current_time)
                 new_event.register_device(self)
                 self.timer.register_event(new_event)
+                self.mode="Alarm resolution--clear the channel"
         elif self.channel_state=="Idle":
             if self.detector.channel_idle():
                 new_event=event.Event("Alarm detected",self.timer.current_time)
                 new_event.register_device(self)
                 self.timer.register_event(new_event)
+                self.mode="Alarm resolution--clear the channel"
         if self.mode=="Alarm resolution--Polling phase" and self.current_slot!=None:
             if self.current_slot.status=="Idle" and self.channel_state=="Busy": # change the slot status to collision (may becomes Received)
                 self.current_slot.status="Collision"
@@ -121,7 +123,7 @@ class  AP(device.Device): # has no  downlink traffic there
         tmp=restricted_access_window.RAW("General",False)
         duration_for_beacon=self.timer.SIFS+packet.BeaconFrame([tmp],self.timer,self,self.STA_list).transmission_delay()
         number_of_beacons=math.ceil((transmission_finish_time+self.timer.SIFS)/duration_for_beacon) #cal the number of beacons needed
-        end_time_for_clearance=number_of_beacons*duration_for_beacon+self.timer.current_time+1-self.timer.SIFS
+        end_time_for_clearance=number_of_beacons*duration_for_beacon+self.timer.current_time-self.timer.SIFS
         for i in range(1,number_of_beacons+1): # put the needed beacons in the queue
             start_time_of_RAW=self.timer.current_time+duration_for_beacon*i-self.timer.SIFS
             RAW=restricted_access_window.RAW("General",False)
@@ -146,6 +148,7 @@ class  AP(device.Device): # has no  downlink traffic there
         self.queue=self.polling_round.generate_beacon(self.timer.current_time+self.timer.SIFS,
             self.channel_state,self.max_data_size)
         ######### send the beacon frame after an SIFS ############
+        # self.transmit_packet(self.queue[0])
         new_event=event.Event("IFS expire",self.timer.current_time+self.timer.SIFS)
         new_event.register_device(self) # register to send the beacon after an SIFS
         self.timer.register_event(new_event)
@@ -186,13 +189,14 @@ class  AP(device.Device): # has no  downlink traffic there
             self.detector.turn_on()
         self.polling_round=restricted_access_window.PollingRound(self.timer,self.max_data_size,self,self.STA_list)
         self.polling_round.set_polling_target(next_STAs_to_check,next_STAs_to_collect,next_blocks_to_check)
-        self.queue=self.polling_round.generate_beacon(self.timer.current_time+self.timer.SIFS,
+        self.queue=self.polling_round.generate_beacon(self.timer.current_time,#+self.timer.SIFS,
             self.channel_state,self.max_data_size)
-        new_event=event.Event("IFS expire",self.timer.current_time+self.timer.SIFS)
-        new_event.register_device(self) # register to send the beacon after an SIFS
-        self.timer.register_event(new_event)
-        self.IFS_expire_event=new_event
-        self.packet_to_send=self.queue[0]
+        # new_event=event.Event("IFS expire",self.timer.current_time+self.timer.SIFS)
+        # new_event.register_device(self) # register to send the beacon after an SIFS
+        # self.timer.register_event(new_event)
+        # self.IFS_expire_event=new_event
+        self.transmit_packet(self.queue[0])
+        # self.packet_to_send=self.queue[0]
         # self.transmit_packet(self.queue[0])
         for each_RAW in self.polling_round.RAWs:
             for each_slot in each_RAW.slot_list: # register when the RAW slot start event

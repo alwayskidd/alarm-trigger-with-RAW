@@ -19,19 +19,19 @@ class Event():
         self.device_list=[]
         self.duration=duration
         priorities={
-            "transmit packet": 1,
-            "packet arrival": 1,
+            "transmit packet": 4,
+            "packet arrival": 0,
             "backoff": 1,
             "transmission end": 1,
             "IFS expire": 1,
             "reply timeout": 1,
             "NAV expire":1,
-            "Wakeup for RAW": 0,
-            "Endup RAW":1,
-            "Raw slot start": 2,
-            "Wakeup during open access": 0,
-            "Polling round end":2,
-            "Alarm detected": 9
+            "Wakeup for RAW": 2,
+            "Endup RAW":0,
+            "Raw slot start": 3,
+            "Wakeup during open access": 2,
+            "Polling round end":1,
+            "Alarm detected": 0
         }
         self.priority=priorities[self.type]
 

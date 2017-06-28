@@ -216,10 +216,9 @@ class Sensor(device.Device):
                     if self in each_slot.STAs:
                         self.next_RAW_slot=each_slot
                         break
-            if each_RAW.end_time>self.next_open_access: #calculate when the next open access will start
-                self.next_open_access=each_RAW.end_time
+                        
+        self.next_open_access=max(x.end_time for x in beacon.RAWs)
         self.status="Sleep"
-        self.next_open_access+=1
         if self.next_RAW_slot!=None: # wake up at certain time for this RAW
             new_event=event.Event("Wakeup for RAW", self.next_RAW_slot.start_time)
             new_event.register_device(self)
@@ -274,7 +273,7 @@ class Sensor(device.Device):
         if not self.queue: # go back to sleep mode
             self.status="Sleep"
             return False
-        assert self.next_open_access>self.timer.current_time, "end_up_RAW function i sensor.py"
+        assert self.next_open_access>=self.timer.current_time, "end_up_RAW function i sensor.py"
         new_event=event.Event("Wakeup during open access",self.next_open_access)
         new_event.register_device(self)
         self.timer.register_event(new_event)
