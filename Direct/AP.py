@@ -148,6 +148,7 @@ class  AP(device.Device): # has no  downlink traffic there
         self.polling_round=restricted_access_window.PollingRound(self.timer,self.max_data_size,
             self,self.STA_list)
         self.polling_round.set_polling_target(STAs_to_check,[],[])
+        assert channel_state=="Idle"
         self.queue=self.polling_round.generate_beacon(self.timer.current_time+self.timer.SIFS,
             self.channel_state,self.max_data_size)
         ######### send the beacon frame after an SIFS ############

@@ -71,7 +71,7 @@ class  AP(device.Device): # has no  downlink traffic there
             elif self.mode=="Alarm resolution--clear the channel":
                 self.__transit_to_polling_phase__()
             else:
-                time.sleep(3)
+                time.sleep(10)
         return 0
 
     def update_receiving_power(self,packets_in_air):

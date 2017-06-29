@@ -148,15 +148,26 @@ class PollingRound():
                 self.check_RAWs.append(new_RAW)
         self.RAWs=self.trigger_RAWs+self.collect_RAWs+self.check_RAWs
         # set the parameters of all the raws in this polling round
+        beacons=[]
         beacon=packet.BeaconFrame(self.RAWs,self.timer,self.AP,self.STA_list)
         if channel_status=="Busy": # need multiple beacon frame to ensure the beacon is correctly received
             import math
+            new_RAW=RAW("General", False)
+            new_beacon=packet.BeaconFrame([new_RAW],self.timer,self.AP,self.STA_list)
             transmission_finish_time=packet.Packet(self.timer,"Data",size=max_data_size).transmission_delay()
-            duration_for_beacon=self.timer.SIFS+beacon.transmission_delay()
-            number_of_beacons=math.ceil(transmission_finish_time/duration_for_beacon)+1
-            start_time=number_of_beacons*duration_for_beacon+beacon_announce_time+1-self.timer.SIFS
+            duration_for_beacon=self.timer.SIFS+new_beacon.transmission_delay()
+            number_of_beacons=math.ceil(transmission_finish_time/duration_for_beacon)
+            end_time_for_clearance=number_of_beacons*duration_for_beacon-self.timer.SIFS+beacon_announce_time
+            for i in range(1,number_of_beacons+1): # general the required beacons to clear the channel
+                start_time_of_RAW=beacon_announce_time+duration_for_beacon*i-self.timer.SIFS
+                new_RAW=RAW("General",False)
+                new_RAW.parameter_setting(start_time_of_RAW,end_time_for_clearance-start_time_of_RAW,1,self.STA_list)
+                new_beacon=packet.BeaconFrame([new_RAW],self.timer,self.AP,self.STA_list)
+                beacons.append(new_beacon)
+            start_time=end_time_for_clearance+self.timer.SIFS+beacon.transmission_delay()+1
         else:   
             start_time=beacon_announce_time+beacon.transmission_delay()+1
+        beacons.append(beacon)
 
         if self.trigger_RAWs:
             self.trigger_RAWs[0].parameter_setting(start_time,self.trigger_slot_duration*self.STAs_to_check.__len__(),
@@ -172,10 +183,7 @@ class PollingRound():
             # set the parameters of check RAW
             start_time=self.check_RAWs[i].end_time
         self.end_time=max(x.end_time for x in beacon.RAWs)
-        if channel_status=="Busy":
-            return [beacon]*number_of_beacons
-        else:
-            return [beacon]
+        return beacons
 
     def find_current_slot(self,current_time):
     # This function is called when a raw slot start, we need to identify which raw slot it is
