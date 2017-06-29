@@ -10,7 +10,7 @@ class  AP(device.Device): # has no  downlink traffic there
         self.idle_start=0
         self.packet_has_received=[]
         self.mode="Open access" # Open access or Alarm resolution
-        self.max_data_size=40 # bytes
+        self.max_data_size=100 # bytes
         self.block_list=None
         self.polling_round=None
         self.detector=alarm_detector.AlarmDetector(timer,300*10**3)
@@ -140,15 +140,14 @@ class  AP(device.Device): # has no  downlink traffic there
         print("\n #####################Transit into the pollling phase######################")
         time.sleep(2)
         self.current_slot=None
-        temp,blocks_to_check=self.block_list.get_blocks_at_certain_level(0),[]
-        for each in temp:
-            if not each.block_finished: # this the packets in block have not been all received, check this block
-                blocks_to_check.append(each)
-
-        print(blocks_to_check.__len__())
+        STAs_to_check=[]
+        # temp,blocks_to_check=self.block_list.get_blocks_at_certain_level(0),[]
+        for each_STA in self.STA_list:
+            if not each_STA in self.block_list.STA_received: # allocate a trigger slot to this STA
+                STAs_to_check.append(each_STA)
         self.polling_round=restricted_access_window.PollingRound(self.timer,self.max_data_size,
             self,self.STA_list)
-        self.polling_round.set_polling_target([],[],blocks_to_check)
+        self.polling_round.set_polling_target(STAs_to_check,[],[])
         self.queue=self.polling_round.generate_beacon(self.timer.current_time+self.timer.SIFS,
             self.channel_state,self.max_data_size)
         ######### send the beacon frame after an SIFS ############
@@ -187,9 +186,12 @@ class  AP(device.Device): # has no  downlink traffic there
         print([x.status for x in RAW_slots])
         next_STAs_to_check,next_STAs_to_collect,next_blocks_to_check=self.polling_round.polling_round_analyse()
         if not (next_STAs_to_collect or next_STAs_to_check or next_blocks_to_check):
+            print("Polling Phase finished ")
+            time.sleep(10)
             self.mode="Open access"
             self.detector.reset()
             self.detector.turn_on()
+            return
         self.polling_round=restricted_access_window.PollingRound(self.timer,self.max_data_size,self,self.STA_list)
         self.polling_round.set_polling_target(next_STAs_to_check,next_STAs_to_collect,next_blocks_to_check)
         self.queue=self.polling_round.generate_beacon(self.timer.current_time,#+self.timer.SIFS,

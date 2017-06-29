@@ -171,7 +171,6 @@ class PollingRound():
             self.check_RAWs[i].parameter_setting(start_time,self.data_slot_duration,block,self.STA_list) 
             # set the parameters of check RAW
             start_time=self.check_RAWs[i].end_time
-
         self.end_time=max(x.end_time for x in beacon.RAWs)
         if channel_status=="Busy":
             return [beacon]*number_of_beacons
