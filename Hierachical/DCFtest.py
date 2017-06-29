@@ -12,7 +12,7 @@ def test(RTS_enable,suspend_enable,CWmax):
     STA_list=[]
     radius=1000
     amount=500 # the total number of stations, it is used to read the corresponding files
-    d_max=1000
+    d_max=400
 
     for times in range(3,4):
         print("system end time="+str(end_time))

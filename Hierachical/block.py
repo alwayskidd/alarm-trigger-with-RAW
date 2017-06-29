@@ -26,7 +26,7 @@ class Block:
         # assert not STA in self.STA_polled, "received an alarm from STA which have already reported"
         if not STA in self.STA_received:
             self.STA_received.append(STA)
-        if len(set(self.STA_list))==len(set(self.STA_polled)): # remark this block as a polled block
+        if len(set(self.STA_list))==len(set(self.STA_received)): # remark this block as a polled block
             self.block_finished=True
         return self.block_finished
 
@@ -45,6 +45,7 @@ class Block:
 
 class BlockList():
     def __init__(self):
+        self.STA_received=[]
         self.blocks=[]
         self.min_length=125
 
@@ -105,11 +106,14 @@ class BlockList():
                     neighbours.append(each_block)
         return(neighbours)
 
-    def report_received(self,STA):
+    def report_received(self,packet):
     # This function is called when an alarm report is received, or AP polled this STA
     # This function is used to remark the source of the alarm report in its blocks as polled
     # Input:
     #   STA--the STA that has been polled
+        STA=packet.source
+        assert not STA in self.STA_received, "A frame is received multiple times"
+        self.STA_received.append(STA)
         for each_block in self.blocks:
             if STA in each_block.STA_list:
                 each_block.report_received(STA)

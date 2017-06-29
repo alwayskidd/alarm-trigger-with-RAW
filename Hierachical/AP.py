@@ -10,7 +10,7 @@ class  AP(device.Device): # has no  downlink traffic there
         self.idle_start=0
         self.packet_has_received=[]
         self.mode="Open access" # Open access or Alarm resolution
-        self.max_data_size=100 # bytes
+        self.max_data_size=40 # bytes
         self.block_list=None
         self.polling_round=None
         self.detector=alarm_detector.AlarmDetector(timer,300*10**3)
@@ -28,11 +28,12 @@ class  AP(device.Device): # has no  downlink traffic there
             if received_packet.packet_type=="Data" or received_packet.packet_type=="NDP Ps-poll":
                 self.packet_to_send=packet.Packet(self.timer,"NDP ACK",self,[received_packet.source])
                 self.packet_has_received.append(received_packet)
-                self.block_list.report_received(received_packet)
                 if self.mode=="Open access" and self.detector.frame_received(received_packet): # register an alarm detect event
                     new_event=event.Event("Alarm detected",self.timer.current_time)
                     new_event.register_device(self)
                     self.timer.register_event(new_event)
+                if received_packet.packet_type=="Data": # record report from this STA is received
+                    self.block_list.report_received(received_packet)
             new_event=event.Event("IFS expire",self.timer.current_time+self.timer.SIFS)
             new_event.register_device(self)
             self.timer.register_event(new_event)
@@ -40,7 +41,6 @@ class  AP(device.Device): # has no  downlink traffic there
             self.packet_can_receive=None
             if self.mode=="Alarm resolution--Polling phase":
                 self.current_slot.status="Received"
-            # since a frame has been received
 
     def IFS_expire(self):
     # This function is called AP has wait for an IFS, (most likely the SIFS)
@@ -140,7 +140,11 @@ class  AP(device.Device): # has no  downlink traffic there
         print("\n #####################Transit into the pollling phase######################")
         time.sleep(2)
         self.current_slot=None
-        blocks_to_check=self.block_list.get_blocks_at_certain_level(0)
+        temp,blocks_to_check=self.block_list.get_blocks_at_certain_level(0),[]
+        for each in temp:
+            if not each.block_finished: # this the packets in block have not been all received, check this block
+                blocks_to_check.append(each)
+
         print(blocks_to_check.__len__())
         self.polling_round=restricted_access_window.PollingRound(self.timer,self.max_data_size,
             self,self.STA_list)
@@ -148,7 +152,6 @@ class  AP(device.Device): # has no  downlink traffic there
         self.queue=self.polling_round.generate_beacon(self.timer.current_time+self.timer.SIFS,
             self.channel_state,self.max_data_size)
         ######### send the beacon frame after an SIFS ############
-        # self.transmit_packet(self.queue[0])
         new_event=event.Event("IFS expire",self.timer.current_time+self.timer.SIFS)
         new_event.register_device(self) # register to send the beacon after an SIFS
         self.timer.register_event(new_event)
@@ -195,9 +198,8 @@ class  AP(device.Device): # has no  downlink traffic there
         # new_event.register_device(self) # register to send the beacon after an SIFS
         # self.timer.register_event(new_event)
         # self.IFS_expire_event=new_event
-        self.transmit_packet(self.queue[0])
         # self.packet_to_send=self.queue[0]
-        # self.transmit_packet(self.queue[0])
+        self.transmit_packet(self.queue[0])
         for each_RAW in self.polling_round.RAWs:
             for each_slot in each_RAW.slot_list: # register when the RAW slot start event
                 new_event=event.Event("Raw slot start",each_slot.start_time)
@@ -206,5 +208,5 @@ class  AP(device.Device): # has no  downlink traffic there
         new_event=event.Event("Polling round end",self.polling_round.end_time) # register when the polling round will end
         new_event.register_device(self)
         self.timer.register_event(new_event)
-        time.sleep(20)
+        time.sleep(5)
         print("\n##############################next polling round##########################################")

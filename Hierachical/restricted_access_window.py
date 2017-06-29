@@ -193,7 +193,7 @@ class PollingRound():
 
     def polling_round_analyse(self):
     # This function is called when a polling round ends, we need to know in the next round what we need to do
-    # Output
+    # Output:
     #   next_STAs_to_check--the STAs to be checked in next polling round
     #   next_STAs_to_collect--the STAs to be polled in next pollling round
     #   next_blocks_to_check--the blocks to be checked in next polling round
@@ -209,7 +209,9 @@ class PollingRound():
             assert status!="Not yet start", "a RAW does not start as rquested"
             if status!="Idle":
                 if block.children_blocks: # check the children blocks
-                    next_blocks_to_check+=block.children_blocks
+                    temp=[x for x in block.children_blocks if x.block_finished==False]
+                    next_blocks_to_check+=temp
                 else: # check each STAs in this block
+                    temp=list(set(block.STA_list)-set(block.STA_received))
                     next_STAs_to_check+=block.STA_list
         return next_STAs_to_check,next_STAs_to_collect,next_blocks_to_check
