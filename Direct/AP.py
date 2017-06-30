@@ -193,7 +193,7 @@ class  AP(device.Device): # has no  downlink traffic there
             self.mode="Open access"
             self.detector.reset()
             self.detector.turn_on()
-            for each_block in self.block_list:
+            for each_block in self.block_list.blocks:
                 each_block.STA_received=[]
             return
         self.polling_round=restricted_access_window.PollingRound(self.timer,self.max_data_size,self,self.STA_list)
