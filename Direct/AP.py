@@ -10,7 +10,7 @@ class  AP(device.Device): # has no  downlink traffic there
         self.idle_start=0
         self.packet_has_received=[]
         self.mode="Open access" # Open access or Alarm resolution
-        self.max_data_size=100 # bytes
+        self.max_data_size=40 # bytes
         self.block_list=None
         self.polling_round=None
         self.detector=alarm_detector.AlarmDetector(timer,300*10**3)
@@ -32,6 +32,7 @@ class  AP(device.Device): # has no  downlink traffic there
                     new_event=event.Event("Alarm detected",self.timer.current_time)
                     new_event.register_device(self)
                     self.timer.register_event(new_event)
+                    self.mode="Alarm resolution--clear the channel"
                 if received_packet.packet_type=="Data": # record report from this STA is received
                     self.block_list.report_received(received_packet)
             new_event=event.Event("IFS expire",self.timer.current_time+self.timer.SIFS)

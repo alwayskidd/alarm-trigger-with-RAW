@@ -106,7 +106,7 @@ class AlarmDetector():
             return False
         if self.busy_duration>=self.maximum_busy_allowed:
             print("alarm detected at "+str(self.timer.current_time))
-            time.sleep(10)
+            # time.sleep(10)
             # exit(0)
             return True
         else:

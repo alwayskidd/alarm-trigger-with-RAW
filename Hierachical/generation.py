@@ -43,7 +43,7 @@ def packet_generation(STA_list,location,speed,sp_type,arg): #generate packe acco
 	print("packet amount="+str(counter))
 
 	import time
-	time.sleep(1)
+	# time.sleep(1)
 	return packet_generation_events,counter
 
 

@@ -32,6 +32,7 @@ class  AP(device.Device): # has no  downlink traffic there
                     new_event=event.Event("Alarm detected",self.timer.current_time)
                     new_event.register_device(self)
                     self.timer.register_event(new_event)
+                    self.mode="Alarm resolution--clear the channel"
                 if received_packet.packet_type=="Data": # record report from this STA is received
                     self.block_list.report_received(received_packet)
             new_event=event.Event("IFS expire",self.timer.current_time+self.timer.SIFS)
