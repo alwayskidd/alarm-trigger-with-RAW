@@ -23,7 +23,7 @@ def test(RTS_enable,suspend_enable,CWmax):
         folder_name="./results/d_max="+str(d_max)+"_amount="+str(amount)
         if not os.path.isdir(folder_name):
             os.mkdir(folder_name)
-        file=open(folder_name+"/CWmax="+str(CWmax)+"_suspend="+str(suspend_enable)+"_round="+str(times)+".txt","w")
+        file=open(folder_name+"/packet_size="+str(packet_size)+"_suspend="+str(suspend_enable)+"_round="+str(times)+".txt","w")
         # file=open("./results/CWmax/CWmax="+str(CWmax)+\
         #  	"_suspend="+str(suspend_enable)+"_round="+str(times)+".txt","w")
         # file=open("./results/d_max="+str(d_max)+"_amount="+str(amount)+"/CWmax=unlimited"+"_suspend="+str(suspend_enable)+"_round="+str(times)+".txt","w")
