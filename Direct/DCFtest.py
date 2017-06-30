@@ -8,7 +8,7 @@ def test(RTS_enable,suspend_enable,CWmax):
     # CWmax=16*(2**6)
     #packet_arrival_rate=1.0/150000 #in us
     end_time=10**6*5
-    packet_size=40 #in bytes, this parameter is also need to be changed in packets.py
+    packet_size=100 #in bytes, this parameter is also need to be changed in packets.py
     STA_list=[]
     radius=1000
     amount=500 # the total number of stations, it is used to read the corresponding files

@@ -10,7 +10,7 @@ class  AP(device.Device): # has no  downlink traffic there
         self.idle_start=0
         self.packet_has_received=[]
         self.mode="Open access" # Open access or Alarm resolution
-        self.max_data_size=40 # bytes
+        self.max_data_size=100 # bytes
         self.block_list=None
         self.polling_round=None
         self.detector=alarm_detector.AlarmDetector(timer,300*10**3)

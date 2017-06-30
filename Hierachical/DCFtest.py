@@ -8,7 +8,7 @@ def test(RTS_enable,suspend_enable,CWmax):
     # CWmax=16*(2**6)
     #packet_arrival_rate=1.0/150000 #in us
     end_time=10**6*5
-    packet_size=40 #in bytes, this parameter is also need to be changed in packets.py
+    packet_size=100 #in bytes, this parameter is also need to be changed in packets.py
     STA_list=[]
     radius=1000
     amount=500 # the total number of stations, it is used to read the corresponding files
@@ -23,7 +23,7 @@ def test(RTS_enable,suspend_enable,CWmax):
         folder_name="./results/d_max="+str(d_max)+"_amount="+str(amount)
         if not os.path.isdir(folder_name):
             os.mkdir(folder_name)
-        file=open(folder_name+"/CWmax="+str(CWmax)+"_suspend="+str(suspend_enable)+"_round="+str(times)+".txt","w")
+        file=open(folder_name+"/packet_size="+str(packet_size)+"_suspend="+str(suspend_enable)+"_round="+str(times)+".txt","w")
         # file=open("./results/CWmax/CWmax="+str(CWmax)+\
         #  	"_suspend="+str(suspend_enable)+"_round="+str(times)+".txt","w")
         # file=open("./results/d_max="+str(d_max)+"_amount="+str(amount)+"/CWmax=unlimited"+"_suspend="+str(suspend_enable)+"_round="+str(times)+".txt","w")
