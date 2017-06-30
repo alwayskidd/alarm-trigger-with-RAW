@@ -7,7 +7,7 @@ def test(RTS_enable,suspend_enable,CWmax):
     CWmin=15
     # CWmax=16*(2**6)
     #packet_arrival_rate=1.0/150000 #in us
-    end_time=10**6*5
+    end_time=10**7*2
     packet_size=100 #in bytes, this parameter is also need to be changed in packets.py
     STA_list=[]
     radius=1000
