@@ -1,18 +1,18 @@
 import system_timer,sensor,event,channel,AP,block,initialization
 import statistics_collection, random, math, os
-def test(RTS_enable,suspend_enable,CWmax):
+def test(RTS_enable,suspend_enable,reserved_data_size):
     PRAWs_duration=5.3*1000
     BI=500*1000
     #STA_number=20
-    CWmin=15
-    # CWmax=16*(2**6)
+    CWmin=16
+    CWmax=16*(2**6) # 1024
     #packet_arrival_rate=1.0/150000 #in us
     end_time=10**7*2
-    packet_size=100 #in bytes, this parameter is also need to be changed in packets.py
+    packet_size=40 #in bytes, this parameter is also need to be changed in packets.py
     STA_list=[]
     radius=1000
     amount=500 # the total number of stations, it is used to read the corresponding files
-    d_max=1000
+    d_max=1900
 
     for times in range(50):
         print("system end time="+str(end_time))
@@ -23,7 +23,7 @@ def test(RTS_enable,suspend_enable,CWmax):
         folder_name="./results/d_max="+str(d_max)+"_amount="+str(amount)
         if not os.path.isdir(folder_name):
             os.mkdir(folder_name)
-        file=open(folder_name+"/packet_size="+str(packet_size)+"_suspend="+str(suspend_enable)+"_round="+str(times)+".txt","w")
+        file=open(folder_name+"/reserved_data_size="+str(reserved_data_size)+"_suspend="+str(suspend_enable)+"_round="+str(times)+".txt","w")
         # file=open("./results/CWmax/CWmax="+str(CWmax)+\
         #  	"_suspend="+str(suspend_enable)+"_round="+str(times)+".txt","w")
         # file=open("./results/d_max="+str(d_max)+"_amount="+str(amount)+"/CWmax=unlimited"+"_suspend="+str(suspend_enable)+"_round="+str(times)+".txt","w")
@@ -33,6 +33,7 @@ def test(RTS_enable,suspend_enable,CWmax):
         system_AP.block_list=initialization.AID_assignment(STA_list)
         system_channel.register_devices(STA_list+[system_AP])
         system_AP.channel=system_channel
+        system_AP.max_data_size=reserved_data_size
         statistics_collection.collector.end_time=end_time
 
         ############# excute the simualtion ####################
@@ -78,6 +79,5 @@ def test(RTS_enable,suspend_enable,CWmax):
         statistics_collection.collector.clear()
         file.close()
 
-for i in range(6,7):
-    test(RTS_enable=False,suspend_enable=False,CWmax=16*(2**i)-1)
-# test(RTS_enable=False,suspend_enable=False,CWmax=16)
+for data_size in range(40,101,10):
+    test(RTS_enable=False,suspend_enable=False,reserved_data_size=data_size)
