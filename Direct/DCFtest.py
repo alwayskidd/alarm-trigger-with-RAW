@@ -12,11 +12,11 @@ def test(RTS_enable,suspend_enable,CWmax):
     STA_list=[]
     radius=1000
     amount=500 # the total number of stations, it is used to read the corresponding files
-    d_max=1000
+    d_max=1900
 
     for times in range(0,50):
         print("system end time="+str(end_time))
-        ############## initialization ###########	
+        ############## initialization ###########
         timer=system_timer.SystemTimer(end_time)
         # file=open("./results/d_max="+str(d_max)+"_amount="+str(amount)+"/CWmax="+str(CWmax)+\
         # 	"_suspend="+str(suspend_enable)+"_round="+str(times)+"_new.txt","w")
@@ -50,7 +50,7 @@ def test(RTS_enable,suspend_enable,CWmax):
                         if each.status!="Sleep":
                             counter.append(each.AID)
                     print("There are "+str(counter.__len__())+" STAs stays awake at "
-                        +str(timer.current_time)) 
+                        +str(timer.current_time))
                     counter=[]
                     backoff_timer=[]
                     for each in STA_list:
