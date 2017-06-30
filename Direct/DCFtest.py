@@ -8,13 +8,13 @@ def test(RTS_enable,suspend_enable,CWmax):
     # CWmax=16*(2**6)
     #packet_arrival_rate=1.0/150000 #in us
     end_time=10**6*5
-    packet_size=20 #in bytes, this parameter is also need to be changed in packets.py
+    packet_size=40 #in bytes, this parameter is also need to be changed in packets.py
     STA_list=[]
     radius=1000
     amount=500 # the total number of stations, it is used to read the corresponding files
     d_max=1000
 
-    for times in range(3,4):
+    for times in range(0,50):
         print("system end time="+str(end_time))
         ############## initialization ###########	
         timer=system_timer.SystemTimer(end_time)
@@ -80,7 +80,10 @@ def test(RTS_enable,suspend_enable,CWmax):
             statistics_collection.collector.channel_busy_time+=timer.end_time-statistics_collection.collector.last_time_idle
 
         statistics_collection.collector.print_statistics_of_delays()
+        print("\n")
         statistics_collection.collector.print_other_statistics(end_time,packet_size)
+        print("\n")
+        statistics_collection.collector.print_polling_info()
         statistics_collection.collector.clear()
         file.close()
 

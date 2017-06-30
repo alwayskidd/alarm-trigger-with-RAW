@@ -1,4 +1,4 @@
-import packet,event,device,restricted_access_window,alarm_detector
+import packet,event,device,restricted_access_window,alarm_detector,statistics_collection
 import time
 class  AP(device.Device): # has no  downlink traffic there
     def __init__(self,locations,CWmin,CWmax,timer,channel):
@@ -55,7 +55,7 @@ class  AP(device.Device): # has no  downlink traffic there
         self.channel.clear_transmission_in_air(self.packet_in_air)
         if self.packet_in_air.destination==self.STA_list:
             print("packet from AP is broadcasted and the frame type is "+self.packet_in_air.packet_type)
-            time.sleep(1)
+            # time.sleep(1)
         else:
             print("packet from AP to STA "+str(self.packet_in_air.destination[0].AID)+
     	   " has been transmitted, packet type is "+self.packet_in_air.packet_type)
@@ -70,8 +70,8 @@ class  AP(device.Device): # has no  downlink traffic there
                 self.packet_to_send=self.queue[0]
             elif self.mode=="Alarm resolution--clear the channel":
                 self.__transit_to_polling_phase__()
-            else:
-                time.sleep(10)
+            # else:
+                # time.sleep(10)
         return 0
 
     def update_receiving_power(self,packets_in_air):
@@ -114,6 +114,7 @@ class  AP(device.Device): # has no  downlink traffic there
     def alarm_detected(self):
     #This function is called when the alarm event is detected
         import math
+        statistics_collection.collector.register_alarm_event(self.timer.current_time)
         self.detector.turn_off()
         self.mode="Alarm resolution--clear the channel"
         self.busy_cannot_decode_start=None
@@ -131,14 +132,14 @@ class  AP(device.Device): # has no  downlink traffic there
             new_beacon=packet.BeaconFrame([RAW],self.timer,self,self.STA_list)
             self.queue.append(new_beacon)
         print("number of beacons:"+str(number_of_beacons))
-        time.sleep(2)
+        # time.sleep(2)
         self.transmit_packet(self.queue[0])
 
     def __transit_to_polling_phase__(self):
     # This function is called when channel is cleard by consecutive beacons
     # and need to transit into polling phase to resolve the alarm reports
         print("\n #####################Transit into the pollling phase######################")
-        time.sleep(2)
+        # time.sleep(2)
         self.current_slot=None
         temp,blocks_to_check=self.block_list.get_blocks_at_certain_level(0),[]
         for each in temp:
@@ -151,6 +152,7 @@ class  AP(device.Device): # has no  downlink traffic there
         self.polling_round.set_polling_target([],[],blocks_to_check)
         self.queue=self.polling_round.generate_beacon(self.timer.current_time+self.timer.SIFS,
             self.channel_state,self.max_data_size)
+        statistics_collection.collector.register_beacons(self.timer.current_time+self.timer.SIFS,self.queue[-1])
         ######### send the beacon frame after an SIFS ############
         new_event=event.Event("IFS expire",self.timer.current_time+self.timer.SIFS)
         new_event.register_device(self) # register to send the beacon after an SIFS
@@ -194,6 +196,7 @@ class  AP(device.Device): # has no  downlink traffic there
         self.polling_round.set_polling_target(next_STAs_to_check,next_STAs_to_collect,next_blocks_to_check)
         self.queue=self.polling_round.generate_beacon(self.timer.current_time,#+self.timer.SIFS,
             self.channel_state,self.max_data_size)
+        statistics_collection.collector.register_beacons(self.timer.current_time,self.queue[-1])
         # new_event=event.Event("IFS expire",self.timer.current_time+self.timer.SIFS)
         # new_event.register_device(self) # register to send the beacon after an SIFS
         # self.timer.register_event(new_event)
@@ -208,5 +211,5 @@ class  AP(device.Device): # has no  downlink traffic there
         new_event=event.Event("Polling round end",self.polling_round.end_time) # register when the polling round will end
         new_event.register_device(self)
         self.timer.register_event(new_event)
-        time.sleep(5)
+        # time.sleep(5)
         print("\n##############################next polling round##########################################")
