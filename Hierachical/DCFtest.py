@@ -61,8 +61,9 @@ def test(RTS_enable,suspend_enable,CWmax):
                         +str(timer.current_time))
                     print("The backoff timers are "+str(backoff_timer)+"\n ")
             if statistics_collection.collector.number_of_packet==statistics_collection.collector.successful_transmissions.__len__(): # stop the simulation
-                statistics_collection.collector.end_time=timer.current_time
-                timer.events=[]
+                if not [x for x in timer.events if x.type=="Polling round end"]:
+                    statistics_collection.collector.end_time=timer.current_time
+                    timer.events=[]
         # for each in STA_list:
         # 	if each.has_pending_packet():
         # 		statistics_collection.collector.register_backoff_times(each.number_of_attempts,each.number_of_backoffs)
