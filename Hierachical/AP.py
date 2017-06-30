@@ -85,13 +85,13 @@ class  AP(device.Device): # has no  downlink traffic there
     #	False--channel status is not changed
         status_changed=super().update_receiving_power(packets_in_air)
         if self.channel_state=="Busy":
-            if self.detector.channel_busy():
+            if self.detector.channel_busy() and self.mode=="Open access":
                 new_event=event.Event("Alarm detected",self.timer.current_time)
                 new_event.register_device(self)
                 self.timer.register_event(new_event)
                 self.mode="Alarm resolution--clear the channel"
         elif self.channel_state=="Idle":
-            if self.detector.channel_idle():
+            if self.detector.channel_idle() and self.mode=="Open access":
                 new_event=event.Event("Alarm detected",self.timer.current_time)
                 new_event.register_device(self)
                 self.timer.register_event(new_event)
