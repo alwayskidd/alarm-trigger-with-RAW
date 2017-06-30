@@ -125,7 +125,7 @@ class  AP(device.Device): # has no  downlink traffic there
         tmp=restricted_access_window.RAW("General",False)
         duration_for_beacon=self.timer.SIFS+packet.BeaconFrame([tmp],self.timer,self,self.STA_list).transmission_delay()
         number_of_beacons=math.ceil((transmission_finish_time+self.timer.SIFS)/duration_for_beacon) #cal the number of beacons needed
-        end_time_for_clearance=number_of_beacons*duration_for_beacon+self.timer.current_time-self.timer.SIFS
+        end_time_for_clearance=number_of_beacons*duration_for_beacon+self.timer.current_time-self.timer.SIFS+1
         for i in range(1,number_of_beacons+1): # put the needed beacons in the queue
             start_time_of_RAW=self.timer.current_time+duration_for_beacon*i-self.timer.SIFS
             RAW=restricted_access_window.RAW("General",False)
@@ -167,7 +167,7 @@ class  AP(device.Device): # has no  downlink traffic there
                 new_event.register_device(self)
                 self.timer.register_event(new_event)
         ######## record when the polling round will end ###############
-        new_event=event.Event("Polling round end",self.polling_round.end_time) # register when the polling round will end
+        new_event=event.Event("Polling round end",self.polling_round.end_time+1) # register when the polling round will end
         new_event.register_device(self)
         self.timer.register_event(new_event)
         self.mode="Alarm resolution--Polling phase"
