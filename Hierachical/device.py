@@ -59,7 +59,7 @@ class Device:
                 if (self.packet_to_send==None or (self.packet_to_send.packet_type!="CTS"
                     and self.packet_to_send.packet_type!="NDP ACK")):
             # The intrruption will be ignored when the pending packet is ACK or CTS frame
-                    assert self.IFS_expire_event.time>=self.timer.current_time
+                    assert self.IFS_expire_event.time>=self.timer.current_time, "%r" % self.IFS_expire_event.time
                     self.timer.remove_event(self.IFS_expire_event)
                     self.IFS_expire_event=None
                     self.packet_to_send=None

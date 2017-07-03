@@ -132,6 +132,7 @@ class Sensor(device.Device):
     #This function is called when an IFS duration is expired and channel is Idle
     #After this IFS duration, the sensor will start transmission or start backoff timer
         assert self.channel_state=="Idle", "IFS expired while the channel is busy STA AID is %d" % self.AID
+        self.IFS_expire_event=None
         if self.packet_to_send==None: #start backoff counter as no packet need to be sent
             self.backoff_status="On"
             if self.timer.backoff_status=="Off": # register a backoff event
