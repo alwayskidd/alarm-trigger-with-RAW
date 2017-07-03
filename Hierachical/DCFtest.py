@@ -78,6 +78,7 @@ def test(RTS_enable,suspend_enable,reserved_data_size):
         statistics_collection.collector.print_polling_info()
         statistics_collection.collector.clear()
         file.close()
+        os.system('cls' if os.name=='nt' else 'clear')
 
 for data_size in range(40,101,10):
     test(RTS_enable=False,suspend_enable=False,reserved_data_size=data_size)

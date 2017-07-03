@@ -20,6 +20,7 @@ class Sensor(device.Device):
     def generate_one_packet(self):
     #This function is called when the sensor is triggered by the event 
     #After being triggered this sensor generates an alarm report
+        print("A packet arrival at STA "+str(self.AID))
         new_packet=packet.Packet(self.timer,"Data",self,[self.AP])
         assert self.status=="Sleep"
         self.status="Listen"
@@ -120,6 +121,7 @@ class Sensor(device.Device):
     #This function is called when NAV has expired 
     #This sensor will start its backoff timer after a DIFS
         assert self.IFS_expire_event==None
+        print("NAV is expired at STA "+str(self.AID))
         if self.channel_state=="Idle" and self.queue: # start backoff after a DIFS if queue is not 
         # empty and channel is idle
             new_event=event.Event("IFS expire",self.timer.current_time+self.timer.DIFS)
@@ -159,6 +161,9 @@ class Sensor(device.Device):
         #clear this event, this event may be register when channel becomes Idle, 
         #EIFS is registered in the update receiving power function
             self.timer.remove_event(self.IFS_expire_event)
+            self.IFS_expire_event=None
+            print("received a packet while a sensor has IFS event STA "+str(self.AID))
+            exit(0)
 
         if self in packet.destination: # when this sensor is one of the receivers
             if packet.packet_type=="NDP ACK": # an ack has been received
