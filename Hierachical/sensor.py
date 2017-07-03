@@ -162,8 +162,8 @@ class Sensor(device.Device):
         #EIFS is registered in the update receiving power function
             self.timer.remove_event(self.IFS_expire_event)
             self.IFS_expire_event=None
-            print("received a packet while a sensor has IFS event STA "+str(self.AID))
-            exit(0)
+            # print("received a packet while a sensor has IFS event STA "+str(self.AID))
+            # exit(0)
 
         if self in packet.destination: # when this sensor is one of the receivers
             if packet.packet_type=="NDP ACK": # an ack has been received
@@ -285,6 +285,12 @@ class Sensor(device.Device):
         self.next_open_access=None
         self.next_RAW_slot=None
         self.status="Sleep"
+        if self.IFS_expire_event!=None: # clear the IFS expire event registered in this RAW
+            self.timer.remove_event(self.IFS_expire_event)
+            self.IFS_expire_event=None
+        if self.NAV_expire_event!=None: # clear the NAV expire event registered in this RAW
+            self.timer.remove_event(self.NAV_expire_event)
+            self.NAV_expire_event=None
         return True
 
     def wakeup_in_open_access(self):
@@ -296,6 +302,7 @@ class Sensor(device.Device):
             return False
         self.access_mode="Open access"
         self.status="Listen"
+        self.backoff_status="On"
         self.CWmin,self.RAW_CWmax=self.open_access_CWmin,self.open_access_CWmax
         if self.freezed_backoff_timer!=None and self.freezed_backoff_stage!=None: # recover the backoff timer
             self.backoff_timer,self.backoff_stage=self.freezed_backoff_timer,self.freezed_backoff_stage
