@@ -302,7 +302,6 @@ class Sensor(device.Device):
             return False
         self.access_mode="Open access"
         self.status="Listen"
-        self.backoff_status="On"
         self.CWmin,self.RAW_CWmax=self.open_access_CWmin,self.open_access_CWmax
         if self.freezed_backoff_timer!=None and self.freezed_backoff_stage!=None: # recover the backoff timer
             self.backoff_timer,self.backoff_stage=self.freezed_backoff_timer,self.freezed_backoff_stage
