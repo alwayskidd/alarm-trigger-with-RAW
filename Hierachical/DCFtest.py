@@ -14,7 +14,7 @@ def test(RTS_enable,suspend_enable,reserved_data_size):
     amount=500 # the total number of stations, it is used to read the corresponding files
     d_max=1900
 
-    for times in range(50):
+    for times in range(10):
         print("system end time="+str(end_time))
         ############## initialization ###########	
         timer=system_timer.SystemTimer(end_time)
