@@ -175,6 +175,9 @@ class Sensor(device.Device):
             if self.time_out_event!=None: # clear the time out event
                 self.timer.remove_event(self.time_out_event)
                 self.time_out_event=None
+            if self.NAV_expire_event!=None: # clear the NAV expire event
+                self.timer.remove_event(self.NAV_expire_event)
+                self.NAV_expire_event=None
         else: # when the sensor is not the one of the receivers
             if self.time_out_event!=None: #collsion happens
                 statistics_collection.collector.register_collision()

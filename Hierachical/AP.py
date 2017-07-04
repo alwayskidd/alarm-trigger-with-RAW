@@ -29,7 +29,7 @@ class  AP(device.Device): # has no  downlink traffic there
                 self.packet_to_send=packet.Packet(self.timer,"NDP ACK",self,[received_packet.source])
                 self.packet_has_received.append(received_packet)
                 if self.mode=="Open access" and self.detector.frame_received(received_packet): # register an alarm detect event
-                    new_event=event.Event("Alarm detected",self.timer.current_time)
+                    new_event=event.Event("Alarm detected",self.timer.current_time+self.timer.SIFS+self.timer.NDP_time+self.timer.SIFS)
                     new_event.register_device(self)
                     self.timer.register_event(new_event)
                     self.mode="Alarm resolution--clear the channel"
