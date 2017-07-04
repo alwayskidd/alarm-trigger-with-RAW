@@ -16,7 +16,7 @@ def test(RTS_enable,suspend_enable,reserved_data_size):
 
     for times in range(10):
         print("system end time="+str(end_time))
-        ############## initialization ###########	
+        ############## initialization ###########
         timer=system_timer.SystemTimer(end_time)
         # file=open("./results/d_max="+str(d_max)+"_amount="+str(amount)+"/CWmax="+str(CWmax)+\
         # 	"_suspend="+str(suspend_enable)+"_round="+str(times)+"_new.txt","w")
@@ -51,7 +51,7 @@ def test(RTS_enable,suspend_enable,reserved_data_size):
                         if each.status!="Sleep":
                             counter.append(each.AID)
                     print("There are "+str(counter.__len__())+" STAs stays awake at "
-                        +str(timer.current_time)) 
+                        +str(timer.current_time))
                     counter=[]
                     backoff_timer=[]
                     for each in STA_list:
