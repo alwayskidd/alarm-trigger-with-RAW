@@ -16,7 +16,7 @@ class SystemTimer():
         self.backoff_status="Off"
 
     def register_event(self,event,print_on=False): # register an event in the timeline
-        assert event.time>=self.current_time, "register an event before current time"
+        assert event.time-self.current_time>=-0.0001, "register an event before current time"
         import copy
         if event.time>self.end_time and (event.type in ["backoff start","backoff","transmission start"]):
             return 0

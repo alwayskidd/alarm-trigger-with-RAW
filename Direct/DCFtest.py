@@ -1,6 +1,6 @@
 import system_timer,sensor,event,channel,AP,block,initialization
 import statistics_collection, random, math, os
-def test(RTS_enable,suspend_enable,reserved_data_size):
+def test(RTS_enable,suspend_enable,reserved_data_size,d_max):
     PRAWs_duration=5.3*1000
     BI=500*1000
     #STA_number=20
@@ -12,7 +12,7 @@ def test(RTS_enable,suspend_enable,reserved_data_size):
     STA_list=[]
     radius=1000
     amount=500 # the total number of stations, it is used to read the corresponding files
-    d_max=1900
+    # d_max=1900
 
     for times in range(50):
         print("system end time="+str(end_time))
@@ -72,12 +72,12 @@ def test(RTS_enable,suspend_enable,reserved_data_size):
             statistics_collection.collector.channel_busy_time+=timer.end_time-statistics_collection.collector.last_time_idle
 
         statistics_collection.collector.print_statistics_of_delays()
-        print("\n")
-        statistics_collection.collector.print_other_statistics(end_time,packet_size)
-        print("\n")
         statistics_collection.collector.print_polling_info()
+        statistics_collection.collector.print_other_statistics(end_time,packet_size)
+        
         statistics_collection.collector.clear()
         file.close()
 
 for data_size in range(40,101,10):
-    test(RTS_enable=False,suspend_enable=False,reserved_data_size=data_size)
+    for d_max in range(400,1901,300):
+        test(RTS_enable=False,suspend_enable=False,reserved_data_size=data_size,d_max=d_max)

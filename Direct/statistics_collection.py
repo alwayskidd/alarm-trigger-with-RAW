@@ -74,6 +74,7 @@ class statisticsCollection():
         	str(self.successful_transmissions.__len__()/(self.successful_transmissions.__len__()+self.collisions))+"\n")
         self.file.write("channel busy time:"+str(self.channel_busy_time)+"\n")
         self.file.write("The end time is "+str(self.end_time)+"\n")
+        self.file.write("The details of frame delay \n"+str(self.delays)+"\n")
 
     def print_polling_info(self):
         self.file.write("The AP detects alarm event for "+str(self.polling_phases_start.__len__())+
