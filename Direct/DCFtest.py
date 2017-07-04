@@ -76,6 +76,7 @@ def test(RTS_enable,suspend_enable,reserved_data_size,d_max):
         statistics_collection.collector.print_other_statistics(end_time,packet_size)
         
         statistics_collection.collector.clear()
+        os.system('cls' if os.name == 'nt' else 'clear')
         file.close()
 
 for data_size in range(40,101,10):

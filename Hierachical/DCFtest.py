@@ -77,6 +77,7 @@ def test(RTS_enable,suspend_enable,reserved_data_size,d_max):
         
         statistics_collection.collector.clear()
         file.close()
+        os.system('cls' if os.name == 'nt' else 'clear')
 
 for data_size in range(40,101,10):
     for d_max in range(400,1901,300):
