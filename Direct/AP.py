@@ -29,11 +29,12 @@ class  AP(device.Device): # has no  downlink traffic there
                 self.packet_to_send=packet.Packet(self.timer,"NDP ACK",self,[received_packet.source])
                 self.packet_has_received.append(received_packet)
                 if self.mode=="Open access" and self.detector.frame_received(received_packet): # register an alarm detect event
-                    new_event=event.Event("Alarm detected",self.timer.current_time+self.timer.SIFS
-                        +self.timer.NDP_time+self.timer.SIFS) # to guarantee the last ACK can be send out 
+                    new_event=event.Event("Alarm detected",self.timer.current_time) # to guarantee the last ACK can be send out 
                     new_event.register_device(self)
                     self.timer.register_event(new_event)
                     self.mode="Alarm resolution--clear the channel"
+                    self.packet_to_send=None
+                    return # if the alarm is detected when a packet is received, AP will not reply with an ACK
                 if received_packet.packet_type=="Data": # record report from this STA is received
                     self.block_list.report_received(received_packet)
             new_event=event.Event("IFS expire",self.timer.current_time+self.timer.SIFS)
@@ -85,18 +86,19 @@ class  AP(device.Device): # has no  downlink traffic there
     #	True--channel status is changed from idle/busy to busy/idle
     #	False--channel status is not changed
         status_changed=super().update_receiving_power(packets_in_air)
-        if self.channel_state=="Busy":
-            if self.detector.channel_busy() and self.mode=="Open access":
-                new_event=event.Event("Alarm detected",self.timer.current_time)
-                new_event.register_device(self)
-                self.timer.register_event(new_event)
-                self.mode="Alarm resolution--clear the channel"
-        elif self.channel_state=="Idle":
-            if self.detector.channel_idle() and self.mode=="Open access":
-                new_event=event.Event("Alarm detected",self.timer.current_time)
-                new_event.register_device(self)
-                self.timer.register_event(new_event)
-                self.mode="Alarm resolution--clear the channel"
+        if self.packet_can_receive in self.packet_in_air: # the current can receive packet is still transmitting
+            if self.channel_state=="Busy" and self.status=="Listen":
+                if self.detector.channel_busy() and self.mode=="Open access":
+                    new_event=event.Event("Alarm detected",self.timer.current_time)
+                    new_event.register_device(self)
+                    self.timer.register_event(new_event)
+                    self.mode="Alarm resolution--clear the channel"
+            elif self.channel_state=="Idle" and self.status=="Listen":
+                if self.detector.channel_idle() and self.mode=="Open access":
+                    new_event=event.Event("Alarm detected",self.timer.current_time)
+                    new_event.register_device(self)
+                    self.timer.register_event(new_event)
+                    self.mode="Alarm resolution--clear the channel"
         if self.mode=="Alarm resolution--Polling phase" and self.current_slot!=None:
             if self.current_slot.status=="Idle" and self.channel_state=="Busy": # change the slot status to collision (may becomes Received)
                 self.current_slot.status="Collision"

@@ -50,7 +50,12 @@ class SystemTimer():
                     	self.events.remove(each_event)
                     flag=1
                     break
-            assert flag==1, "remove a event does not exist "+ str(event.device_list[0].AID)
+            try:
+                assert flag==1
+            except AssertionError:
+                print("current time is "+str(self.current_time)+" the event time is "+str(self.event.time))
+                print("STA is "+event.device_list[0].AID)
+            # assert flag==1, "remove a event does not exist "+ str(event.device_list[0].AID)
             assert temp_len==event.device_list.__len__(), str(temp_len)+" "+str(event.device_list.__len__())
         else:
             assert device!=None, "no device and no event need to be removed"
