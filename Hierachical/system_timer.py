@@ -55,6 +55,7 @@ class SystemTimer():
             except AssertionError:
                 print("current time is "+str(self.current_time)+" the event time is "+str(self.event.time))
                 print("STA is "+event.device_list[0].AID)
+                exit(1)
             assert temp_len==event.device_list.__len__(), str(temp_len)+" "+str(event.device_list.__len__())
         else:
             assert device!=None, "no device and no event need to be removed"
