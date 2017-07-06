@@ -211,7 +211,8 @@ class  AP(device.Device): # has no  downlink traffic there
         # self.timer.register_event(new_event)
         # self.IFS_expire_event=new_event
         # self.packet_to_send=self.queue[0]
-        self.transmit_packet(self.queue[0])
+        if self.packet_in_air==None:
+            self.transmit_packet(self.queue[0])
         for each_RAW in self.polling_round.RAWs:
             for each_slot in each_RAW.slot_list: # register when the RAW slot start event
                 new_event=event.Event("Raw slot start",each_slot.start_time)

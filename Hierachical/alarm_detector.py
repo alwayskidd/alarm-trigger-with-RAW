@@ -83,31 +83,15 @@ class AlarmDetector():
 
 
     def detect_alarm(self):
-        if self.busy_duration==0: # we can reset the alarm detector
-            self.reset()
-            print("detector reset due to no busy time")
-            return False
+        T_total=self.timer.current_time-self.detect_start_time
         if self.idle_start_time!=None:
-            current_idle_duration=self.timer.current_time-self.idle_start_time
-            if current_idle_duration>1024*self.timer.slot_time:
+            T_ci=self.timer.current_time-self.idle_start_time
+            if T_ci>1023*self.timer.slot_time:
                 self.reset()
-                print("detector reset due to long idle preriod")
-                return False
-        if self.idle_duration*5>self.timer.current_time-self.detect_start_time:
+        if self.busy_duration/T_total<0.8:
+            print("reset due to not that busy")
             self.reset()
-            print("detector reset due to high proportion of idle period")
-            return False
-        if self.frame_receiving_duration*5>self.busy_duration:
-            print(self.frame_receiving_duration*5>self.busy_duration)
-            print("receiving:"+str(self.frame_receiving_duration))
-            print("busy:"+str(self.busy_duration))
-            self.reset()
-            print("detector reset due to high proportion of receiveing period")
-            return False
         if self.busy_duration>=self.maximum_busy_allowed:
-            print("alarm detected at "+str(self.timer.current_time))
-            # time.sleep(10)
-            # exit(0)
             return True
         else:
             return False
