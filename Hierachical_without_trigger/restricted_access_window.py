@@ -205,11 +205,11 @@ class PollingRound():
     #   next_STAs_to_collect--the STAs to be polled in next pollling round
     #   next_blocks_to_check--the blocks to be checked in next polling round
         next_STAs_to_collect,next_STAs_to_check,next_blocks_to_check=[],[],[]
-        for each_RAW in self.trigger_RAWs:
-            for each_slot in each_RAW.slot_list: # check whether the ps-poll is get
-                # assert each_slot.status=="Idle" or each_slot.status=="Received", 'a Trigger RAW slot is Collided'
-                if each_slot.status=="Received": # collect data from this STA in next round
-                    next_STAs_to_collect+=each_slot.STAs
+        # for each_RAW in self.trigger_RAWs:
+        #     for each_slot in each_RAW.slot_list: # check whether the ps-poll is get
+        #         # assert each_slot.status=="Idle" or each_slot.status=="Received", 'a Trigger RAW slot is Collided'
+        #         if each_slot.status=="Received": # collect data from this STA in next round
+        #             next_STAs_to_collect+=each_slot.STAs
         for each_RAW in self.check_RAWs:
             block=each_RAW.block
             status=each_RAW.slot_list[0].status
@@ -220,5 +220,5 @@ class PollingRound():
                     next_blocks_to_check+=temp
                 else: # check each STAs in this block
                     temp=list(set(block.STA_list)-set(block.STA_received))
-                    next_STAs_to_check+=temp
+                    next_STAs_to_collect+=temp
         return next_STAs_to_check,next_STAs_to_collect,next_blocks_to_check
