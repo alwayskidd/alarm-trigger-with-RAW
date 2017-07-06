@@ -18,32 +18,52 @@ class  AP(device.Device): # has no  downlink traffic there
     def register_associated_STAs(self,STA_list):
         self.STA_list=STA_list
 
+    def __received_data__(self,received_packet):
+        assert received_packet.packet_type=="Data"
+        if self.mode=="Open access":
+            if self.detector.frame_received(received_packet): # detect an alarm, don't reply this data
+                new_event=event.Event("Alarm detected",self.timer.current_time)
+                new_event.register_device(self)
+                self.timer.register_event(new_event)
+                self.mode="Alarm resolution--clear the channel"
+                self.packet_to_send=None
+                return False
+            else: # reply this data
+                self.block_list.report_received(received_packet)
+                self.packet_to_send=packet.Packet(self.timer,"NDP ACK",self,[received_packet.source])
+        elif self.mode=="Alarm resolution--Polling phase":
+            expected_time=self.timer.NDP_time+self.timer.SIFS
+            if expected_time+self.timer.current_time>=self.polling_round_end+1: # don't reply this Data
+                self.packet_to_send=None
+                return False
+            else: # reply this data
+                self.packet_to_send=packet.Packet(self.timer,"NDP ACK",self,[received_packet.source])
+                self.block_list.report_received(received_packet)
+        elif self.mode=="Alarm resolution--clear the channel": # don't reply this Data
+            self.packet_to_send=None
+            return False
+        return True
+
     def packet_received(self,received_packet):
     # This function is called when AP receives an packet from some STAs
     # Input:
     #	packet--the received packet at AP
+        assert received_packet==self.packet_can_receive
         if self in received_packet.destination:
             if received_packet.packet_type=="RTS":
                 self.packet_to_send=packet.Packet(self.timer,"CTS",self,[received_packet.source])
-            if received_packet.packet_type=="Data" or received_packet.packet_type=="NDP Ps-poll":
+            if received_packet.packet_type=="NDP Ps-poll":
                 self.packet_to_send=packet.Packet(self.timer,"NDP ACK",self,[received_packet.source])
-                self.packet_has_received.append(received_packet)
-                if self.mode=="Open access" and self.detector.frame_received(received_packet): # register an alarm detect event
-                    new_event=event.Event("Alarm detected",self.timer.current_time)
-                    new_event.register_device(self)
-                    self.timer.register_event(new_event)
-                    self.mode="Alarm resolution--clear the channel"
-                    self.packet_to_send=None
-                    return
-                if received_packet.packet_type=="Data": # record report from this STA is received
-                    self.block_list.report_received(received_packet)
-            new_event=event.Event("IFS expire",self.timer.current_time+self.timer.SIFS)
-            new_event.register_device(self)
-            self.timer.register_event(new_event)
-            self.IFS_expire_event=new_event
-            self.packet_can_receive=None
+            if received_packet.packet_type=="Data":
+                self.__received_data__(received_packet)
+            if self.packet_to_send!=None:
+                new_event=event.Event("IFS expire",self.timer.current_time+self.timer.SIFS)
+                new_event.register_device(self)
+                self.timer.register_event(new_event)
+                self.IFS_expire_event=new_event
             if self.mode=="Alarm resolution--Polling phase":
                 self.current_slot.status="Received"
+            self.packet_can_receive==None
 
     def IFS_expire(self):
     # This function is called AP has wait for an IFS, (most likely the SIFS)
@@ -217,7 +237,7 @@ class  AP(device.Device): # has no  downlink traffic there
                 new_event=event.Event("Raw slot start",each_slot.start_time)
                 new_event.register_device(self)
                 self.timer.register_event(new_event)
-        new_event=event.Event("Polling round end",self.polling_round.end_time) # register when the polling round will end
+        new_event=event.Event("Polling round end",self.polling_round.end_time+1) # register when the polling round will end
         new_event.register_device(self)
         self.timer.register_event(new_event)
         # time.sleep(5)
