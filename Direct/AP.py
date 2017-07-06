@@ -33,7 +33,7 @@ class  AP(device.Device): # has no  downlink traffic there
                 self.packet_to_send=packet.Packet(self.timer,"NDP ACK",self,[received_packet.source])
         elif self.mode=="Alarm resolution--Polling phase":
             expected_time=self.timer.NDP_time+self.timer.SIFS
-            if expected_time+self.timer.current_time>=self.polling_round_end+1: # don't reply this Data
+            if expected_time+self.timer.current_time>=self.polling_round.end_time+1: # don't reply this Data
                 self.packet_to_send=None
                 return False
             else: # reply this data
