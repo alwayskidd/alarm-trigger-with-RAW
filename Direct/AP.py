@@ -63,7 +63,7 @@ class  AP(device.Device): # has no  downlink traffic there
                 self.IFS_expire_event=new_event
             if self.mode=="Alarm resolution--Polling phase":
                 self.current_slot.status="Received"
-            self.packet_can_receive==None
+        self.packet_can_receive=None
 
     def IFS_expire(self):
     # This function is called AP has wait for an IFS, (most likely the SIFS)
@@ -199,7 +199,7 @@ class  AP(device.Device): # has no  downlink traffic there
         print("##################### A RAW start ######################### at "+str(self.timer.current_time))
         self.current_slot=self.polling_round.find_current_slot(self.timer.current_time)
         print("RAW type is "+str(self.current_slot.raw_type))
-        self.current_slot.status="Idle"
+        self.current_slot.status=self.channel_state # Busy or Idle
 
     def polling_round_end(self):
     # This function is called when polling round ends
@@ -224,13 +224,7 @@ class  AP(device.Device): # has no  downlink traffic there
         self.queue=self.polling_round.generate_beacon(self.timer.current_time,#+self.timer.SIFS,
             self.channel_state,self.max_data_size)
         statistics_collection.collector.register_beacons(self.timer.current_time,self.queue[-1])
-        # new_event=event.Event("IFS expire",self.timer.current_time+self.timer.SIFS)
-        # new_event.register_device(self) # register to send the beacon after an SIFS
-        # self.timer.register_event(new_event)
-        # self.IFS_expire_event=new_event
-        # self.packet_to_send=self.queue[0]
-        if self.packet_in_air==None:
-            self.transmit_packet(self.queue[0])
+        self.transmit_packet(self.queue[0])
         for each_RAW in self.polling_round.RAWs:
             for each_slot in each_RAW.slot_list: # register when the RAW slot start event
                 new_event=event.Event("Raw slot start",each_slot.start_time)
