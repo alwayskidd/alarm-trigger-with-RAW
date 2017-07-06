@@ -16,11 +16,10 @@ class SystemTimer():
         self.backoff_status="Off"
 
     def register_event(self,event,print_on=False): # register an event in the timeline
-        assert event.time-self.current_time>=-0.0001, "register an event before current time"
+        assert event.time-self.current_time>=-0.0001, "current time %r, event.time %r" % (self.current_time,event.time)
         import copy
         if event.time>self.end_time and (event.type in ["backoff start","backoff","transmission start"]):
             return 0
-
         events=[x for x in self.events if ((x.time==event.time) and (x.type==event.type))]
         if events:
             assert events.__len__()<=1 and event.device_list.__len__()<=1
@@ -53,10 +52,9 @@ class SystemTimer():
             try:
                 assert flag==1
             except AssertionError:
-                print("current time is "+str(self.current_time)+" the event time is "+str(self.event.time))
+                print("current time is "+str(self.current_time)+" the event time is "+str(event.time))
                 print("STA is "+event.device_list[0].AID)
                 exit(1)
-            # assert flag==1, "remove a event does not exist "+ str(event.device_list[0].AID)
             assert temp_len==event.device_list.__len__(), str(temp_len)+" "+str(event.device_list.__len__())
         else:
             assert device!=None, "no device and no event need to be removed"

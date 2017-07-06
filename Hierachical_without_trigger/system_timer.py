@@ -20,7 +20,6 @@ class SystemTimer():
         import copy
         if event.time>self.end_time and (event.type in ["backoff start","backoff","transmission start"]):
             return 0
-
         events=[x for x in self.events if ((x.time==event.time) and (x.type==event.type))]
         if events:
             assert events.__len__()<=1 and event.device_list.__len__()<=1
@@ -53,7 +52,7 @@ class SystemTimer():
             try:
                 assert flag==1
             except AssertionError:
-                print("current time is "+str(self.current_time)+" the event time is "+str(self.event.time))
+                print("current time is "+str(self.current_time)+" the event time is "+str(event.time))
                 print("STA is "+event.device_list[0].AID)
                 exit(1)
             assert temp_len==event.device_list.__len__(), str(temp_len)+" "+str(event.device_list.__len__())

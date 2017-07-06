@@ -281,7 +281,7 @@ class Sensor(device.Device):
         if not self.queue: # go back to sleep mode
             self.status="Sleep"
             return False
-        assert self.next_open_access>=self.timer.current_time, "end_up_RAW function i sensor.py"
+        assert self.next_open_access-self.timer.current_time>-0.0001, "end_up_RAW function i sensor.py"
         new_event=event.Event("Wakeup during open access",self.next_open_access)
         new_event.register_device(self)
         self.timer.register_event(new_event)
