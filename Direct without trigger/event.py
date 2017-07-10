@@ -1,4 +1,5 @@
 import statistics_collection
+from decimal import Decimal
 class Event():
     def __init__(self, event_type, start_time,duration=0):
         self.type=event_type 
@@ -15,9 +16,9 @@ class Event():
         #   Polling round end--a polling round is ended
         #   NAV expire--the NAV is time out
         #   Endup RAW--the event that a RAW is end up
-        self.time=start_time
+        self.time=Decimal(start_time)
         self.device_list=[]
-        self.duration=duration
+        self.duration=Decimal(duration)
         priorities={
             "transmit packet": 4,
             "packet arrival": 0,

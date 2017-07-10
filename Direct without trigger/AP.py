@@ -13,7 +13,7 @@ class  AP(device.Device): # has no  downlink traffic there
         self.max_data_size=100 # bytes
         self.block_list=None
         self.polling_round=None
-        self.detector=alarm_detector.AlarmDetector(timer,300*10**3)
+        self.detector=alarm_detector.AlarmDetector(timer,200*10**3)
 
     def register_associated_STAs(self,STA_list):
         self.STA_list=STA_list

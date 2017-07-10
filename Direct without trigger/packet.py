@@ -1,3 +1,4 @@
+from decimal import Decimal
 class Packet:
 	def __init__(self,timer,packet_type,source=None,destination=None,size=None):
 		self.registered_time=timer.current_time
@@ -36,8 +37,7 @@ class Packet:
 
 	def transmission_delay(self,phy_data_rate=150):
 		if not 'NDP' in self.packet_type: # calculate the transmission delay
-			# print(self.packet_type)
-			return(self.size*8/phy_data_rate*1000)
+			return(Decimal(str(self.size*8/phy_data_rate*1000)))
 		else:
 			return 560
 
