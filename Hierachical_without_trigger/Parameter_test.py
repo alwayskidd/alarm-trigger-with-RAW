@@ -65,8 +65,8 @@ def test(d_max,threshold,detection_time):
         file.close()
         os.system('cls' if os.name == 'nt' else 'clear')
 
-
-for threshold in range(0.5,0.9,0.1):
+import numpy as np
+for threshold in np.arange(0.5,1,0.1):
     for detection_time in range(100*10**3,500*10**3,50*10**3):
         for d_max in range(400,1901,300):
             test(d_max,threshold,detection_time)
