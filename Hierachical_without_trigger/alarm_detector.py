@@ -92,6 +92,7 @@ class AlarmDetector():
             if T_ci>1023*self.timer.slot_time:
                 self.reset()
         if self.busy_duration/T_total<self.threshold:
+            print(self.threshold)
             print("reset due to not that busy")
             self.reset()
         if self.busy_duration>=self.maximum_busy_allowed:

@@ -1,7 +1,7 @@
 import packet,event,device,restricted_access_window,alarm_detector,statistics_collection
 import time
 class  AP(device.Device): # has no  downlink traffic there
-    def __init__(self,locations,CWmin,CWmax,timer,channel,detection_time,threshold):
+    def __init__(self,locations,CWmin,CWmax,timer,channel,threshold,detection_time):
         device.Device.__init__(self,locations,CWmin,CWmax,timer,channel)
         self.AID=0
         self.status="Listen" # AP status: listen or transmit
@@ -138,6 +138,8 @@ class  AP(device.Device): # has no  downlink traffic there
     def alarm_detected(self):
     #This function is called when the alarm event is detected
         import math
+        print("Alarm detected")
+        # time.sleep(50)
         statistics_collection.collector.register_alarm_event(self.timer.current_time)
         self.detector.turn_off()
         self.mode="Alarm resolution--clear the channel"

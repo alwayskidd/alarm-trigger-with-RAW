@@ -9,19 +9,20 @@ def test(d_max,threshold,detection_time):
     STA_list=[]
     radius=1000
     amount=500
+    CWmax=1024
     for times in range(10):
-        timer=system_timer.system_timer(end_time)
-        folder_name="./Parameter_test/Thr="+str(threshold)+"_T="+str(detection_time)
+        timer=system_timer.SystemTimer(end_time)
+        folder_name="./Parameter_test/Thr="+str(threshold)+"_T="+str(detection_time/10**3)
         if not os.path.isdir(folder_name):
             os.makedirs(folder_name)
-        file=open(folder_name+"d_max="+str(d_max)+".txt")
+        file=open(folder_name+"/d_max="+str(d_max)+"_round="+str(times)+".txt",'w')
         statistics_collection.collector.set_output_file(file)
         system_channel=channel.channel()
         AP,STA_list=initialization.init(amount,d_max,timer,False,False,CWmax,
             system_channel,threshold,detection_time)
         AP.block_list=initialization.AID_assignment(STA_list)
         system_channel.register_devices(STA_list+[AP])
-        AP.channel.system_channel
+        AP.channel=system_channel
         AP.max_data_size=packet_size
         statistics_collection.collector.end_time=end_time
         ################# start the simulation ##################
@@ -30,9 +31,9 @@ def test(d_max,threshold,detection_time):
             for each_event in current_events:
                 if each_event.type!="backoff":
                     print("The event type is "+each_event.type+" at "+str(timer.current_time))
-                if each_event.timer>timer.end_time:
+                if each_event.time>timer.end_time:
                     break
-                each_event.excute(STA_list+[AP],timer,system_channel)
+                each_event.execute(STA_list+[AP],timer,system_channel)
                 if each_event.type!="backoff":
                     counter=[]
                     for each in STA_list: # how many STAs stay awake
