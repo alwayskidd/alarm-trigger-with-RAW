@@ -11,11 +11,11 @@ class Sensor(device.Device):
         self.access_mode="Open access" # the access mechanism is used currently
         self.next_RAW_slot,self.next_open_access=None,None # the restricted window this sensor is currently involved
         self.receiving_power=0 # mW
-        self.RAW_CWmin,self.RAW_CWmax=7,15  #the contention window parameter within a RAW
-        self.open_access_CWmin,self.open_access_CWmax=15,1023 #the contention window parameter in open access
+        self.RAW_CWmin,self.RAW_CWmax=8,16  #the contention window parameter within a RAW
+        self.open_access_CWmin,self.open_access_CWmax=16,1024 #the contention window parameter in open access
         self.freezed_backoff_timer,self.freezed_backoff_stage=None,None
-        self.number_of_attempts=0
-        self.number_of_backoffs=0
+        # self.number_of_attempts=0
+        # self.number_of_backoffs=0
 
     def generate_one_packet(self):
     #This function is called when the sensor is triggered by the event 
@@ -260,7 +260,7 @@ class Sensor(device.Device):
         self.CWmin,self.CWmax=self.RAW_CWmin,self.RAW_CWmax
         self.freezed_backoff_timer=self.backoff_timer
         self.freezed_backoff_stage=self.backoff_stage
-        self.backoff_timer=random.randint(0,self.CWmin)
+        self.backoff_timer=random.randint(0,self.CWmin-1)
         self.backoff_stage=self.CWmin
         if self.channel_state=="Idle": # start backoff after DIFS
             new_event=event.Event("IFS expire",self.timer.DIFS+self.timer.current_time)

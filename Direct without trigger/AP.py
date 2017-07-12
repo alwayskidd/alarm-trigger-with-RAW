@@ -1,7 +1,7 @@
 import packet,event,device,restricted_access_window,alarm_detector,statistics_collection
 import time
 class  AP(device.Device): # has no  downlink traffic there
-    def __init__(self,locations,CWmin,CWmax,timer,channel):
+    def __init__(self,locations,CWmin,CWmax,timer,channel,threshold,detection_time):
         device.Device.__init__(self,locations,CWmin,CWmax,timer,channel)
         self.AID=0
         self.status="Listen" # AP status: listen or transmit
@@ -13,8 +13,7 @@ class  AP(device.Device): # has no  downlink traffic there
         self.max_data_size=100 # bytes
         self.block_list=None
         self.polling_round=None
-        self.detector=alarm_detector.AlarmDetector(timer,200*10**3)
-
+        self.detector=alarm_detector.AlarmDetector(timer,detection_time,threshold)
     def register_associated_STAs(self,STA_list):
         self.STA_list=STA_list
 
