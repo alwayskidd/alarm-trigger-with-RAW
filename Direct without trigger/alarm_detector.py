@@ -84,6 +84,8 @@ class AlarmDetector():
 
     def detect_alarm(self):
         T_total=self.timer.current_time-self.detect_start_time
+        if T_total==0:
+            return False
         if self.idle_start_time!=None:
             T_ci=self.timer.current_time-self.idle_start_time
             if T_ci>1023*self.timer.slot_time:

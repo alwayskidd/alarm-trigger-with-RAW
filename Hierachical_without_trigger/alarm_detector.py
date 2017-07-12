@@ -1,6 +1,6 @@
 import time
 class AlarmDetector():
-    def __init__(self,timer,maximum_busy_allowed):
+    def __init__(self,timer,maximum_busy_allowed,threshold):
         self.timer,self.maximum_busy_allowed=timer,maximum_busy_allowed # in ms
         self.current_state="Idle" # could be idle or busy
         self.detect_start_time=self.timer.current_time # record the detect time
@@ -8,6 +8,7 @@ class AlarmDetector():
         self.idle_duration=0 # the accumulated duration for listening the channel but no one is sending
         self.idle_start_time=0 # the time when current idle state starts
         self.on_off="On"
+        self.threshold=threshold
 
         # self.busy_duration,self.busy_start_time=None,None
         # self.idle_duration,self.idle_start_time=None,None
@@ -84,11 +85,13 @@ class AlarmDetector():
 
     def detect_alarm(self):
         T_total=self.timer.current_time-self.detect_start_time
+        if T_total==0:
+            return False
         if self.idle_start_time!=None:
             T_ci=self.timer.current_time-self.idle_start_time
             if T_ci>1023*self.timer.slot_time:
                 self.reset()
-        if self.busy_duration/T_total<0.8:
+        if self.busy_duration/T_total<self.threshold:
             print("reset due to not that busy")
             self.reset()
         if self.busy_duration>=self.maximum_busy_allowed:

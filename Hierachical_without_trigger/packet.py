@@ -8,7 +8,7 @@ class Packet:
 		self.packet_type=packet_type
 		if packet_type=="Data":
 			if size==None:
-				self.size=40 # bytes
+				self.size=100 # bytes
 			else:
 				self.size=size #bytes
 			self.NAV=timer.SIFS+Packet(timer,"NDP ACK",source,destination).transmission_delay()
