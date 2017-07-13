@@ -17,6 +17,7 @@ class AlarmDetector():
     def turn_off(self):
         self.on_off="Off"
     def turn_on(self):
+        print("detector turns on")
         self.on_off="On"
 
     def reset(self):
@@ -91,6 +92,7 @@ class AlarmDetector():
             T_ci=self.timer.current_time-self.idle_start_time
             if T_ci>1023*self.timer.slot_time:
                 self.reset()
+                print("reset due to idle")
         if self.busy_duration/T_total<self.threshold:
             print(self.threshold)
             print("reset due to not that busy")

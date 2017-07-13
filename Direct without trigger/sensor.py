@@ -121,7 +121,7 @@ class Sensor(device.Device):
     #This function is called when NAV has expired 
     #This sensor will start its backoff timer after a DIFS
         assert self.IFS_expire_event==None
-        print("NAV is expired at STA "+str(self.AID))
+        # print("NAV is expired at STA "+str(self.AID))
         if self.channel_state=="Idle" and self.queue: # start backoff after a DIFS if queue is not 
         # empty and channel is idle
             new_event=event.Event("IFS expire",self.timer.current_time+self.timer.DIFS)

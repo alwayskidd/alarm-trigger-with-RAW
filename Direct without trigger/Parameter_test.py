@@ -1,5 +1,5 @@
 import system_timer,sensor,event,channel,AP,block,initialization
-import statistics_collection, random, math, os
+import statistics_collection, random, math, os, sys
 
 
 
@@ -26,6 +26,7 @@ def test(d_max,threshold,detection_time):
         AP.max_data_size=packet_size
         statistics_collection.collector.end_time=end_time
         ################# start the simulation ##################
+        sys.stdout=open('test.txt','w')
         while timer.events:
             current_events=timer.get_next_events()
             for each_event in current_events:
@@ -49,7 +50,7 @@ def test(d_max,threshold,detection_time):
                             backoff_timer.append(each.backoff_timer)
                     print("There are "+str(counter.__len__())+" STAs are competing for the channel at "
                         +str(timer.current_time))
-                    print("The backoff timers are "+str(backoff_timer)+"\n ")
+                    # print("The backoff timers are "+str(backoff_timer)+"\n ")
             if (statistics_collection.collector.number_of_packet==
                 statistics_collection.collector.successful_transmissions.__len__()): 
                 if not [x for x in timer.events if x.type=="Polling round end"]:# stop the simulation

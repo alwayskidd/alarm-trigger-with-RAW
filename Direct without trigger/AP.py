@@ -1,5 +1,5 @@
 import packet,event,device,restricted_access_window,alarm_detector,statistics_collection
-import time
+import time,sys,os
 class  AP(device.Device): # has no  downlink traffic there
     def __init__(self,locations,CWmin,CWmax,timer,channel,threshold,detection_time):
         device.Device.__init__(self,locations,CWmin,CWmax,timer,channel)
@@ -157,6 +157,7 @@ class  AP(device.Device): # has no  downlink traffic there
             self.queue.append(new_beacon)
         print("number of beacons:"+str(number_of_beacons))
         # time.sleep(2)
+        sys.stdout=open(os.devnull,'w')
         self.transmit_packet(self.queue[0])
 
     def __transit_to_polling_phase__(self):
@@ -214,6 +215,7 @@ class  AP(device.Device): # has no  downlink traffic there
         print([x.status for x in RAW_slots])
         next_STAs_to_check,next_STAs_to_collect,next_blocks_to_check=self.polling_round.polling_round_analyse()
         if not (next_STAs_to_collect or next_STAs_to_check or next_blocks_to_check):
+            sys.stdout=open('test.txt','a')
             print("Polling Phase finished ")
             self.mode="Open access"
             self.detector.reset()
