@@ -136,6 +136,7 @@ class  AP(device.Device): # has no  downlink traffic there
 
     def alarm_detected(self):
     #This function is called when the alarm event is detected
+        assert self.timer.current_time<=5*10**6, "alarm detector doesn't work well"
         import math
         statistics_collection.collector.register_alarm_event(self.timer.current_time)
         self.detector.turn_off()
