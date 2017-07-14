@@ -16,6 +16,7 @@ class AlarmDetector():
 
     def turn_off(self):
         self.on_off="Off"
+
     def turn_on(self):
         print("detector turns on")
         self.on_off="On"

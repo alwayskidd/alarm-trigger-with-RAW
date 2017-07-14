@@ -48,8 +48,8 @@ def test(d_max,threshold,detection_time):
                             counter.append(each.AID)
                             backoff_timer.append(each.backoff_timer)
                     print("There are "+str(counter.__len__())+" STAs are competing for the channel at "
-                        +str(timer.current_time))
-                    print("The backoff timers are "+str(backoff_timer)+"\n ")
+                        +str(timer.current_time)+"\n")
+                    # print("The backoff timers are "+str(backoff_timer)+"\n ")
             if (statistics_collection.collector.number_of_packet==
                 statistics_collection.collector.successful_transmissions.__len__()): 
                 if not [x for x in timer.events if x.type=="Polling round end"]:# stop the simulation
@@ -68,6 +68,6 @@ def test(d_max,threshold,detection_time):
 
 import numpy as np
 for threshold in np.arange(0.5,1,0.1):
-    for detection_time in range(100*10**3,500*10**3,50*10**3):
+    for detection_time in range(100*10**3,500*10**3+1,50*10**3):
         for d_max in range(400,1901,300):
             test(d_max,threshold,detection_time)

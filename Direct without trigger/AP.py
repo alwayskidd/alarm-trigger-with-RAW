@@ -105,8 +105,9 @@ class  AP(device.Device): # has no  downlink traffic there
     #	True--channel status is changed from idle/busy to busy/idle
     #	False--channel status is not changed
         status_changed=super().update_receiving_power(packets_in_air)
-        if self.packet_can_receive in packets_in_air: # the current can receive packet is still transmitting
+        if self.packet_can_receive==None or (self.packet_can_receive in packets_in_air): # the current can receive packet is still transmitting, or none of the frames can be received
             if self.channel_state=="Busy" and self.status=="Listen":
+                print("detecting process 1")
                 if self.detector.channel_busy() and self.mode=="Open access":
                     new_event=event.Event("Alarm detected",self.timer.current_time)
                     new_event.register_device(self)
@@ -157,7 +158,7 @@ class  AP(device.Device): # has no  downlink traffic there
             self.queue.append(new_beacon)
         print("number of beacons:"+str(number_of_beacons))
         # time.sleep(2)
-        sys.stdout=open(os.devnull,'w')
+        # sys.stdout=open(os.devnull,'w')
         self.transmit_packet(self.queue[0])
 
     def __transit_to_polling_phase__(self):
@@ -215,8 +216,10 @@ class  AP(device.Device): # has no  downlink traffic there
         print([x.status for x in RAW_slots])
         next_STAs_to_check,next_STAs_to_collect,next_blocks_to_check=self.polling_round.polling_round_analyse()
         if not (next_STAs_to_collect or next_STAs_to_check or next_blocks_to_check):
-            sys.stdout=open('test.txt','a')
+            # sys.stdout=open('test.txt','a')
             print("Polling Phase finished ")
+            print(self.status)
+            print(self.channel_state)
             self.mode="Open access"
             self.detector.reset()
             self.detector.turn_on()

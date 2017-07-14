@@ -10,10 +10,6 @@ class AlarmDetector():
         self.on_off="On"
         self.threshold=threshold
 
-        # self.busy_duration,self.busy_start_time=None,None
-        # self.idle_duration,self.idle_start_time=None,None
-        # self.last_ACK_transmitted,self.last_ACK_time=False,None
-
     def turn_off(self):
         self.on_off="Off"
     def turn_on(self):
