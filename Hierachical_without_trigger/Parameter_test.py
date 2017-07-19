@@ -1,16 +1,17 @@
 import system_timer,sensor,event,channel,AP,block,initialization
-import statistics_collection, random, math, os
+import statistics_collection, random, math, os,sys
 
 
 
 def test(d_max,threshold,detection_time):
-    end_time=10**7*2
+    end_time=10**7
     packet_size=100
     STA_list=[]
     radius=1000
     amount=500
     CWmax=1024
     for times in range(10):
+        sys.stdout=open("log_file_Thr="+str(threshold)+".txt",'w')
         timer=system_timer.SystemTimer(end_time)
         folder_name="./Parameter_test/Thr="+str(threshold)+"_T="+str(detection_time/10**3)
         if not os.path.isdir(folder_name):
@@ -67,7 +68,16 @@ def test(d_max,threshold,detection_time):
         os.system('cls' if os.name == 'nt' else 'clear')
 
 import numpy as np
-for threshold in np.arange(0.5,1,0.1):
+def outer_iteration(threshold):
     for detection_time in range(100*10**3,500*10**3+1,50*10**3):
         for d_max in range(400,1901,300):
             test(d_max,threshold,detection_time)
+
+  
+from multiprocessing import Pool
+import threading
+p=Pool(8)
+for threshold in np.arange(0.5,1,0.1):
+    p.apply_async(outer_iteration,args=(threshold))
+p.close()
+p.join()

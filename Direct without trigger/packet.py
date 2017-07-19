@@ -8,7 +8,7 @@ class Packet:
 		self.packet_type=packet_type
 		if packet_type=="Data":
 			if size==None:
-				self.size=40 # bytes
+				self.size=100 # bytes
 			else:
 				self.size=size #bytes
 			self.NAV=timer.SIFS+Packet(timer,"NDP ACK",source,destination).transmission_delay()
@@ -39,7 +39,7 @@ class Packet:
 		if not 'NDP' in self.packet_type: # calculate the transmission delay
 			return(Decimal(str(self.size*8/phy_data_rate*1000)))
 		else:
-			return 560
+			return Decimal(560)
 
 	def register_NAV_affect_STA(self,STA):
 		#print("register NAV are called "+str(self))

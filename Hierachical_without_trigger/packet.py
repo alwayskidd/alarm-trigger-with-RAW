@@ -39,7 +39,7 @@ class Packet:
 		if not 'NDP' in self.packet_type: # calculate the transmission delay
 			return(Decimal(str(self.size*8/phy_data_rate*1000)))
 		else:
-			return 560
+			return Decimal(560)
 
 	def register_NAV_affect_STA(self,STA):
 		#print("register NAV are called "+str(self))

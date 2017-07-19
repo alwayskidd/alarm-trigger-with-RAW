@@ -26,15 +26,13 @@ def end_time_statistics(filename):
     #     np.mean(detection_times_list),np.mean(frames_to_send),np.mean(frames_transmitted))
     return np.mean(frames_to_send),np.mean(frames_transmitted),np.mean(detection_times_list),average_end_time,yerr
 
-filename="./Hierachical/Thr=0.5_T=100.0/d_max=1000"
-end_time_statistics(filename)
 
 out_file_name="results.csv"
 fp=open(out_file_name,"w")
 fp.write("d_max,threshold,T,scheme,number of STAs triggered,number of frames retrived,alarm detecting times,total time spend, confidence interval\n")
 for d_max in range(400,1901,300):
-    for Thr in np.arange(0.5,0.6,0.1):
-        for T in np.arange(100.0,500.0,50.0):
+    for Thr in np.arange(0.5,1,0.1):
+        for T in np.arange(100.0,500.0+1,50.0):
             fp.write(str(d_max)+","+str(Thr)+","+str(T))
             filename="./Hierachical/Thr="+str(Thr)+"_T="+str(T)+"/d_max="+str(d_max)
             fp.write(",Hierachical,")
@@ -48,4 +46,3 @@ for d_max in range(400,1901,300):
             frames_to_send,frames_transmitted,detection_times,end_time,interval=end_time_statistics(filename)
             fp.write(str(frames_to_send)+","+str(frames_transmitted)+","+str(detection_times)+","
                 +str(end_time)+","+str(interval)+"\n")
-

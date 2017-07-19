@@ -9,7 +9,7 @@ class SystemTimer():
         self.DIFS=Decimal(str(264)) # in us, in 3.9 of doc.:IEEE 8021.11-11/1137r15
         self.ACK_time=Decimal(str(750)) #14*40 # in us, using 150kbps, packet size 100 bytes, NDP_ACK 14*40 us, +SIFS ????
         self.NDP_time=Decimal(str(560)) #14*40 in us
-        self.EIFS=self.SIFS+self.DIFS+self.NDP_time
+        self.EIFS=Decimal(self.SIFS+self.DIFS+self.NDP_time)
         self.events=[]
         self.backoff_status="Off"
 
@@ -51,7 +51,7 @@ class SystemTimer():
                 assert flag==1
             except AssertionError:
                 print("current time is "+str(self.current_time)+" the event time is "+str(event.time))
-                print("STA is "+event.device_list[0].AID)
+                print("STA is "+str(event.device_list[0].AID))
                 exit(1)
             assert temp_len==event.device_list.__len__(), str(temp_len)+" "+str(event.device_list.__len__())
         else:
