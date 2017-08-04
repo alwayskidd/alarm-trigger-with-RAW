@@ -2,10 +2,10 @@ import event,device,packet,system_timer
 import random,statistics_collection
 
 class Sensor(device.Device):
-    def __init__(self,AID,CWmin,CWmax,locations,RTS_enabled,suspend_enabled,AP,timer,channel):
+    def __init__(self,AID,CWmin,CWmax,locations,RTS_enabled,suspend_enabled,AP,timer,channel,data_size=100):
         device.Device.__init__(self,locations,CWmin,CWmax,timer,channel)
         self.RTS_enabled,self.suspend_enabled=RTS_enabled,suspend_enabled # True or False
-        # self.packet_to_send=None
+        self.data_size=data_size
         self.AID=AID
         self.AP=AP
         self.access_mode="Open access" # the access mechanism is used currently
@@ -14,14 +14,12 @@ class Sensor(device.Device):
         self.RAW_CWmin,self.RAW_CWmax=8,16  #the contention window parameter within a RAW
         self.open_access_CWmin,self.open_access_CWmax=16,1024 #the contention window parameter in open access
         self.freezed_backoff_timer,self.freezed_backoff_stage=None,None
-        # self.number_of_attempts=0
-        # self.number_of_backoffs=0
 
     def generate_one_packet(self):
     #This function is called when the sensor is triggered by the event 
     #After being triggered this sensor generates an alarm report
         print("A packet arrival at STA "+str(self.AID))
-        new_packet=packet.Packet(self.timer,"Data",self,[self.AP])
+        new_packet=packet.Packet(self.timer,"Data",self,[self.AP],self.data_size)
         assert self.status=="Sleep"
         self.status="Listen"
         self.queue.append(new_packet) # push this packet into the queue

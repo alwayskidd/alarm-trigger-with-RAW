@@ -8,13 +8,13 @@ def test(RTS_enable,suspend_enable,reserved_data_size,d_max):
     CWmax=16*(2**6) # 1024
     #packet_arrival_rate=1.0/150000 #in us
     end_time=10**7*2
-    packet_size=100 #in bytes, this parameter is also need to be changed in packets.py
+    data_size=reserved_data_size #in bytes, this parameter is also need to be changed in packets.py
     STA_list=[]
     radius=1000
     amount=500 # the total number of stations, it is used to read the corresponding files
     # d_max=1900
 
-    for times in range(10):
+    for times in range(20):
         print("system end time="+str(end_time))
         ############## initialization ###########	
         timer=system_timer.SystemTimer(end_time)
@@ -22,14 +22,14 @@ def test(RTS_enable,suspend_enable,reserved_data_size,d_max):
         # 	"_suspend="+str(suspend_enable)+"_round="+str(times)+"_new.txt","w")
         folder_name="./results/d_max="+str(d_max)+"_amount="+str(amount)
         if not os.path.isdir(folder_name):
-            os.mkdir(folder_name)
-        file=open(folder_name+"/reserved_data_size="+str(reserved_data_size)+"_suspend="+str(suspend_enable)+"_round="+str(times)+".txt","w")
+            os.makedirs(folder_name)
+        file=open(folder_name+"/data_size="+str(data_size)+"_round="+str(times)+".txt","w")
         # file=open("./results/CWmax/CWmax="+str(CWmax)+\
         #  	"_suspend="+str(suspend_enable)+"_round="+str(times)+".txt","w")
         # file=open("./results/d_max="+str(d_max)+"_amount="+str(amount)+"/CWmax=unlimited"+"_suspend="+str(suspend_enable)+"_round="+str(times)+".txt","w")
         statistics_collection.collector.set_output_file(file)
         system_channel=channel.channel()
-        system_AP,STA_list=initialization.init(amount,d_max,timer,RTS_enable,suspend_enable,CWmax,system_channel)
+        system_AP,STA_list=initialization.init(amount,d_max,timer,RTS_enable,suspend_enable,CWmax,system_channel,data_size)
         system_AP.block_list=initialization.AID_assignment(STA_list)
         system_channel.register_devices(STA_list+[system_AP])
         system_AP.channel=system_channel
@@ -73,11 +73,11 @@ def test(RTS_enable,suspend_enable,reserved_data_size,d_max):
 
         statistics_collection.collector.print_statistics_of_delays()
         statistics_collection.collector.print_polling_info()
-        statistics_collection.collector.print_other_statistics(end_time,packet_size)
+        statistics_collection.collector.print_other_statistics(end_time,data_size)
         
         statistics_collection.collector.clear()
-        file.close()
         os.system('cls' if os.name == 'nt' else 'clear')
+        file.close()
 
 for data_size in range(40,101,10):
     for d_max in range(400,1901,300):

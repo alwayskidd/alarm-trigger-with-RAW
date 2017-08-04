@@ -1,7 +1,7 @@
 import system_timer,sensor,event,channel,AP,block
 import statistics_collection,random,math,os
 
-def init(amount,d_max,timer,RTS_enable,suspend_enable,CWmax,channel,threshold=0.8,detection_time=300*10**3):
+def init(amount,d_max,timer,RTS_enable,suspend_enable,CWmax,channel,threshold=0.8,detection_time=300*10**3,data_size=100):
     CWmin=16
     file=open(os.path.pardir+"/events/station_list_amount="+str(amount)+"_d_max="+str(d_max)+".pkl","rb")
     import pickle
@@ -11,7 +11,7 @@ def init(amount,d_max,timer,RTS_enable,suspend_enable,CWmax,channel,threshold=0.
     for i in range(amount): # generate sensors according to the recorded locations
         x=pickle.load(file)
         y=pickle.load(file)
-        STA_list.append(sensor.Sensor(i+1,CWmin,CWmax,[x,y],RTS_enable,suspend_enable,system_AP,timer,channel))
+        STA_list.append(sensor.Sensor(i+1,CWmin,CWmax,[x,y],RTS_enable,suspend_enable,system_AP,timer,channel,data_size))
     file.close()
     system_AP.register_associated_STAs(STA_list)
     file=open(os.path.pardir+"/events/packet_events_amount="+str(amount)+"_d_max="+str(d_max)+".pkl","rb")

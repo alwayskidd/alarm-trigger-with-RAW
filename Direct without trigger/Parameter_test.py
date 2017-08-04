@@ -1,13 +1,9 @@
-import system_timer,sensor,event,channel,AP,block,initialization
-import statistics_collection, random, math, os,sys
-
-
-
+import system_timer,sensor,channel,initialization
+import statistics_collection, os,sys
 def test(d_max,threshold,detection_time):
     end_time=10**7
     packet_size=100
     STA_list=[]
-    radius=1000
     amount=500
     CWmax=1024
     for times in range(10):
@@ -74,10 +70,7 @@ def outer_iteration(threshold):
             test(d_max,threshold,detection_time)
 
   
-from multiprocessing import Pool
-import threading
-p=Pool(8)
+import multiprocessing
 for threshold in np.arange(0.5,1,0.1):
-    p.apply_async(outer_iteration,args=(threshold))
-p.close()
-p.join()
+    p=multiprocessing.Process(traget=outer_iteration,args=(threshold,))
+    p.start()
