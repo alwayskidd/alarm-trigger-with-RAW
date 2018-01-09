@@ -16,7 +16,7 @@ def test(RTS_enable,suspend_enable,reserved_data_size,d_max):
 
     for times in range(20):
         print("system end time="+str(end_time))
-        ############## initialization ###########	
+        ############## initialization ###########
         timer=system_timer.SystemTimer(end_time)
         # file=open("./results/d_max="+str(d_max)+"_amount="+str(amount)+"/CWmax="+str(CWmax)+\
         # 	"_suspend="+str(suspend_enable)+"_round="+str(times)+"_new.txt","w")
@@ -29,7 +29,8 @@ def test(RTS_enable,suspend_enable,reserved_data_size,d_max):
         # file=open("./results/d_max="+str(d_max)+"_amount="+str(amount)+"/CWmax=unlimited"+"_suspend="+str(suspend_enable)+"_round="+str(times)+".txt","w")
         statistics_collection.collector.set_output_file(file)
         system_channel=channel.channel()
-        system_AP,STA_list=initialization.init(amount,d_max,timer,RTS_enable,suspend_enable,CWmax,system_channel,data_size)
+        system_AP,STA_list=initialization.init(amount,d_max,timer,RTS_enable,
+                                               suspend_enable,CWmax,system_channel,data_size=data_size,threshold=0.7)
         system_AP.block_list=initialization.AID_assignment(STA_list)
         system_channel.register_devices(STA_list+[system_AP])
         system_AP.channel=system_channel
@@ -51,7 +52,7 @@ def test(RTS_enable,suspend_enable,reserved_data_size,d_max):
                         if each.status!="Sleep":
                             counter.append(each.AID)
                     print("There are "+str(counter.__len__())+" STAs stays awake at "
-                        +str(timer.current_time)) 
+                        +str(timer.current_time))
                     counter=[]
                     backoff_timer=[]
                     for each in STA_list:
@@ -74,11 +75,14 @@ def test(RTS_enable,suspend_enable,reserved_data_size,d_max):
         statistics_collection.collector.print_statistics_of_delays()
         statistics_collection.collector.print_polling_info()
         statistics_collection.collector.print_other_statistics(end_time,data_size)
-        
+
         statistics_collection.collector.clear()
         os.system('cls' if os.name == 'nt' else 'clear')
         file.close()
 
-for data_size in range(40,101,10):
+import multiprocessing
+for data_size in range(40,101,30):
     for d_max in range(400,1901,300):
-        test(RTS_enable=False,suspend_enable=False,reserved_data_size=data_size,d_max=d_max)
+        p=multiprocessing.Process(target=test,args=(False,False,data_size,d_max))
+        p.start()
+        # test(RTS_enable=False,suspend_enable=False,reserved_data_size=data_size,d_max=d_max)

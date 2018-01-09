@@ -65,6 +65,7 @@ def test(d_max,threshold,detection_time):
 
 import numpy as np
 def outer_iteration(threshold):
+    d_max=1900
     for detection_time in range(100*10**3,500*10**3+1,50*10**3):
         for d_max in range(400,1901,300):
             test(d_max,threshold,detection_time)
@@ -74,3 +75,9 @@ import multiprocessing
 for threshold in np.arange(0.5,1,0.1):
     p=multiprocessing.Process(traget=outer_iteration,args=(threshold,))
     p.start()
+# threshold=0.8
+# d_max=1900
+# import multiprocessing
+# for detection_time in range(100*10**3,500*10**3+1,50*10**3):
+#     p=multiprocessing.Process(target=test,args=(d_max,threshold,detection_time,))
+#     p.start()
